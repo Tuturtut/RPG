@@ -1,6 +1,7 @@
 from Entity import Entity
 from EventManager import EventManager
 from Goblin import Goblin
+import time
 
 
 class CombatManager:
@@ -27,6 +28,7 @@ class CombatManager:
             self.enemy_turn()
 
             self.show_turn()
+            time.sleep(3)
 
         self.show_results()
 
@@ -38,7 +40,7 @@ class CombatManager:
             goblin2 = Goblin("Goblin 2")
 
 
-            player = Entity("Player", 100, 40, 5)
+            player = Entity("John", 100, 40, 5)
 
             cls._instance = CombatManager(player, [goblin1, goblin2])
         return cls._instance
@@ -47,6 +49,8 @@ class CombatManager:
         if (self.player.is_alive()):
             self.player.attack(self.current_enemies[0])
 
+        time.sleep(1)
+
     
     def enemy_turn(self):
         for enemy in self.current_enemies:
@@ -54,9 +58,11 @@ class CombatManager:
                 enemy.attack(self.player)
             else: 
                 self.current_enemies.remove(enemy)
+        
+            time.sleep(1)
     
     def show_turn(self):
-        print("Turn:")
+        print("\n---------------Résultat du tour----------------")
         print(f"Player: {self.player}")
         for enemy in self.current_enemies:
             print(f"Enemy: {enemy}")

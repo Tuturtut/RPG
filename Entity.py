@@ -7,21 +7,28 @@ class Entity:
         self.defense = defense
     
     def __str__(self):
-        return f"{self.name} (Health: {self.health}, Damage: {self.damage}, Defense: {self.defense})"
+        return f"{self.name} {self.health_bar(self.health, self.max_health)}"
     
+
+    def health_bar(self, current, max_hp, length=20):
+        filled = int(length * current / max_hp)
+        empty = length - filled
+        return f"[{'█'*filled}{'░'*empty}] {current}/{max_hp}\n"
+
     
     def take_damage(self, damage):
         final_damage = max(0, damage - self.defense)
         self.health -= final_damage
-        print(f"{self.name} takes {final_damage} damage. Health: {self.health} / {self.max_health}")
+        # Affichage des dégâts dans un format lisible
+        print(f"{self.name} takes {final_damage} damage!")
+        print(self.health_bar(self.health, self.max_health))
         self.after_damage()
 
     def after_damage(self):
         pass
     
     def attack(self, target):
-        print(f"{self.name} attacks {target.name}")
-        print(f"\n")
+        print(f"[{self.name} -> {target.name}]")
         target.take_damage(self.damage)
     
     def is_alive(self):

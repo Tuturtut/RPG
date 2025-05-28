@@ -1,8 +1,10 @@
+from Actions.TalkAction import TalkAction
 from Entity import Entity
 from EventManager import EventManager
 from Goblin import Goblin
 import time
 from Actions.AttackAction import AttackAction
+from Actions.SummonEntityAction import SummonEntityAction
 from random import randint
 
 
@@ -21,7 +23,7 @@ class CombatManager:
     
 
     def handle_event(self, event, data):
-        if event == "summon" and isinstance(data, Goblin):
+        if event == "summon" and isinstance(data, Entity):
             self.add_enemy(data)
     
     def run_combat(self):
@@ -39,20 +41,22 @@ class CombatManager:
     def get_instance(cls):
         if cls._instance is None:
 
-            action = AttackAction("Attack", description="Attack the enemy")
+            attack = AttackAction("Attack", description="Attack the enemy")
+            summon_goblin = SummonEntityAction("Summon Goblin", Goblin("Goblin", 40, 8, 0, False), description="Summon a Goblin", proc_chance=0.5, rounds=1)
+
 
             goblin1 = Goblin("Goblin 1")
             goblin2 = Goblin("Goblin 2")
+            goblin1.add_action(summon_goblin)
+            goblin2.add_action(summon_goblin)
 
+            player = Entity("John", 100, 10, 5, actions=[attack])
 
-            player = Entity("John", 100, 60, 5, actions=[action])
-
-            cls._instance = CombatManager(player, [goblin1, goblin2])
+            cls._instance = CombatManager(player, [goblin1])
         return cls._instance
 
     def player_turn(self):
         if (self.player.is_alive()):
-            # Random choice between enemies
             self.player.setTarget(self.current_enemies[randint(0, len(self.current_enemies) - 1)])
             self.player.use_action(self.player.actions[0])
 
@@ -63,7 +67,7 @@ class CombatManager:
         for enemy in self.current_enemies[:]:
             if enemy.is_alive():
                 enemy.setTarget(self.player)
-                enemy.use_action(enemy.actions[0])
+                enemy.use_action(enemy.getAction())
             else: 
                 self.current_enemies.remove(enemy)
         

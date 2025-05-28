@@ -1,4 +1,3 @@
-from Actions.TalkAction import TalkAction
 from Entity import Entity
 from EventManager import EventManager
 from Goblin import Goblin
@@ -39,20 +38,24 @@ class CombatManager:
     
     @classmethod
     def get_instance(cls):
+
+        def create_goblin():
+            goblin = Goblin("Goblin", 40, 8, 0, False)
+            return goblin
+
         if cls._instance is None:
 
             attack = AttackAction("Attack", description="Attack the enemy")
-            summon_goblin = SummonEntityAction("Summon Goblin", Goblin("Goblin", 40, 8, 0, False), description="Summon a Goblin", proc_chance=0.5, rounds=1)
 
 
             goblin1 = Goblin("Goblin 1")
             goblin2 = Goblin("Goblin 2")
-            goblin1.add_action(summon_goblin)
-            goblin2.add_action(summon_goblin)
+            goblin1.add_action(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1))
+            goblin2.add_action(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1))
 
-            player = Entity("John", 100, 10, 5, actions=[attack])
+            player = Entity("John", 100, 40, 5, actions=[attack])
 
-            cls._instance = CombatManager(player, [goblin1])
+            cls._instance = CombatManager(player, [goblin1, goblin2])
         return cls._instance
 
     def player_turn(self):

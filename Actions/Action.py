@@ -1,13 +1,14 @@
 import random
 
 class Action:
-    def __init__(self, name, rounds,  target=None, description="", proc_chance=1):
+    def __init__(self, name, rounds,  target=None, description="", proc_chance=1, usable=True):
         self.name = name
         self.description = description
         self.rounds = rounds
         self.rounds_left = rounds
         self.target = target
         self.proc_chance = proc_chance
+        self.usable = usable
     
     def execute(self, user):
         if self.rounds_left > 0:

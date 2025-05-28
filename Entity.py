@@ -26,9 +26,15 @@ class Entity:
         # Affichage des dégâts dans un format lisible
         print(f"{self.name} takes {final_damage} damage!")
         print(self.health_bar(self.health, self.max_health))
+        self.after_taking_damage()
+    def after_taking_damage(self):
+        pass
     
     def use_action(self, action):
         action.execute(self)
+    
+    def is_injured(self):
+        return self.health < self.max_health
     
     def is_alive(self):
         return self.health > 0

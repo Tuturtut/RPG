@@ -2,6 +2,8 @@ from Entity import Entity
 from EventManager import EventManager
 from Goblin import Goblin
 import time
+from Actions.AttackAction import AttackAction
+from random import randint
 
 
 class CombatManager:
@@ -36,26 +38,32 @@ class CombatManager:
     @classmethod
     def get_instance(cls):
         if cls._instance is None:
+
+            action = AttackAction("Attack", description="Attack the enemy")
+
             goblin1 = Goblin("Goblin 1")
             goblin2 = Goblin("Goblin 2")
 
 
-            player = Entity("John", 100, 40, 5)
+            player = Entity("John", 100, 60, 5, actions=[action])
 
             cls._instance = CombatManager(player, [goblin1, goblin2])
         return cls._instance
 
     def player_turn(self):
         if (self.player.is_alive()):
-            self.player.attack(self.current_enemies[0])
+            # Random choice between enemies
+            self.player.setTarget(self.current_enemies[randint(0, len(self.current_enemies) - 1)])
+            self.player.use_action(self.player.actions[0])
 
         time.sleep(1)
 
     
     def enemy_turn(self):
-        for enemy in self.current_enemies:
+        for enemy in self.current_enemies[:]:
             if enemy.is_alive():
-                enemy.attack(self.player)
+                enemy.setTarget(self.player)
+                enemy.use_action(enemy.actions[0])
             else: 
                 self.current_enemies.remove(enemy)
         

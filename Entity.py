@@ -1,10 +1,11 @@
 class Entity:
-    def __init__(self, name, health, damage, defense):
+    def __init__(self, name, health, damage, defense, actions=None):
         self.name = name
         self.max_health = health
         self.health = health
         self.damage = damage
         self.defense = defense
+        self.actions = actions
     
     def __str__(self):
         return f"{self.name} {self.health_bar(self.health, self.max_health)}"
@@ -27,10 +28,13 @@ class Entity:
     def after_damage(self):
         pass
     
-    def attack(self, target):
-        print(f"[{self.name} -> {target.name}]")
-        target.take_damage(self.damage)
+    def use_action(self, action):
+        action.execute(self)
     
     def is_alive(self):
         return self.health > 0
+    
+    def setTarget(self, target):
+        for action in self.actions:
+            action.setTarget(target)
     

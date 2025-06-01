@@ -1,10 +1,12 @@
 from Entity import Entity
 from EventManager import EventManager
 from Goblin import Goblin
+from Player import Player
 import time
 from Actions.AttackAction import AttackAction
 from Actions.SummonEntityAction import SummonEntityAction
 from random import randint
+from logger import logger
 
 
 class CombatManager:
@@ -50,18 +52,22 @@ class CombatManager:
 
             goblin1 = Goblin("Goblin 1")
             goblin2 = Goblin("Goblin 2")
-            goblin1.add_action(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1))
-            goblin2.add_action(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1))
+            goblin1.addAction(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1, needs_target=False))
+            goblin2.addAction(SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1, needs_target=False))
 
-            player = Entity("John", 100, 40, 5, actions=[attack])
+            player = Player("John", 100, 40, 5, actions=[attack, SummonEntityAction("Summon Goblin", create_goblin, description="Summon a Goblin", proc_chance=0.5, rounds=1, needs_target=False)])
 
             cls._instance = CombatManager(player, [goblin1, goblin2])
         return cls._instance
 
     def player_turn(self):
         if (self.player.is_alive()):
-            self.player.setTarget(self.current_enemies[randint(0, len(self.current_enemies) - 1)])
-            self.player.use_action(self.player.actions[0])
+            action = self.player.getAction()
+
+            logger.debug(f"Player chose action: {action.name}")
+
+            self.player.setTarget(self.current_enemies)
+            self.player.use_action(action)
 
         time.sleep(1)
 
@@ -69,8 +75,9 @@ class CombatManager:
     def enemy_turn(self):
         for enemy in self.current_enemies[:]:
             if enemy.is_alive():
+                action = enemy.getAction()
                 enemy.setTarget(self.player)
-                enemy.use_action(enemy.getAction())
+                enemy.use_action(action)
             else: 
                 self.current_enemies.remove(enemy)
         
@@ -85,9 +92,9 @@ class CombatManager:
 
     def show_results(self):
         if self.player.is_alive():
-            print("You win!")
+            logger.info("You win!")
         else:
-            print("You lose!")
+            logger.info("You lose!")
 
     def add_enemy(self, enemy):
         self.current_enemies.append(enemy)

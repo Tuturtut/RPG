@@ -1,5 +1,7 @@
 import random
 
+from logger import logger
+
 class Entity:
     def __init__(self, name, health, damage, defense, actions=None):
         self.name = name
@@ -10,8 +12,11 @@ class Entity:
         self.actions = actions
         self.current_action = None
     
+    def getName(self):
+        return f"[{self.name}]"
+
     def __str__(self):
-        return f"{self.name} {self.health_bar(self.health, self.max_health)}"
+        return f"{self.getName()} {self.health_bar(self.health, self.max_health)}"
     
 
     def health_bar(self, current, max_hp, length=20):
@@ -23,10 +28,11 @@ class Entity:
     def take_damage(self, damage):
         final_damage = max(0, damage - self.defense)
         self.health -= final_damage
-        # Affichage des dégâts dans un format lisible
-        print(f"{self.name} takes {final_damage} damage!")
+        print(f"{self.getName()} takes {final_damage} damage!")
         print(self.health_bar(self.health, self.max_health))
         self.after_taking_damage()
+
+
     def after_taking_damage(self):
         pass
     
@@ -40,25 +46,30 @@ class Entity:
         return self.health > 0
     
     def setTarget(self, target):
-        for action in self.actions:
-            action.setTarget(target)
+        if not self.current_action.needsTarget():
+            return
+        else:
+            self.current_action.setTarget(target)
 
     # Renvoie une action au hasard ou retourne l'action courante si elle n'est pas terminée
     def getAction(self):
         if self.current_action is None:
             self.current_action = self.getRandomAction()
+            logger.debug(f"{self.getName()} selected new action: {self.current_action.name}")
             return self.current_action
         else:
             if self.current_action.rounds_left > 0:
+                logger.debug(f"{self.getName()} continues with action: {self.current_action.name}")
                 return self.current_action
             else:
-                returned_action = self.current_action
-                self.current_action = None
-                return returned_action
+                logger.debug(f"{self.getName()} action finished: {self.current_action.name}")
+                return self.current_action
+
+
     
     def getRandomAction(self):
         return self.actions[random.randint(0, len(self.actions) - 1)]
     
-    def add_action(self, action):
+    def addAction(self, action):
         self.actions.append(action)
     

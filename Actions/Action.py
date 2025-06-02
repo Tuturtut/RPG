@@ -2,7 +2,7 @@ import random
 from logger import logger  # Ajouté pour le logging
 
 class Action:
-    def __init__(self, name, rounds, target=None, description="", proc_chance=1, usable=True, needs_target=True):
+    def __init__(self, name, rounds, target=None, description="", proc_chance=1, usable=True, needs_target=True, valid_target_types=None):
         self.name = name
         self.description = description
         self.rounds = rounds
@@ -11,6 +11,7 @@ class Action:
         self.proc_chance = proc_chance
         self.usable = usable
         self.needs_target = needs_target
+        self.valid_target_types = valid_target_types if valid_target_types is not None else []
         logger.debug(f"Action created: {self.name}, needs_target={self.needs_target}, rounds={self.rounds}")
 
     def needsTarget(self):

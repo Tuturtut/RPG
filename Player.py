@@ -28,7 +28,11 @@ class Player(Entity):
             self.current_action.setTarget(None)
             return
 
-        alive_enemies = [enemy for enemy in enemies if enemy.is_alive()]
+        alive_enemies = [
+            enemy for enemy in enemies
+            if enemy.is_alive() and any(isinstance(enemy, t) for t in self.current_action.valid_target_types)
+        ]
+        
         if not alive_enemies:
             print("Aucun ennemi vivant.")
             self.current_action.setTarget(None)

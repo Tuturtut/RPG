@@ -47,7 +47,7 @@ class CombatManager:
 
         if cls._instance is None:
 
-            attack = AttackAction("Attack", description="Attack the enemy")
+            attack = AttackAction("Attack", description="Attack the enemy", valid_target_types=[Goblin])
 
 
             goblin1 = Goblin("Goblin 1")

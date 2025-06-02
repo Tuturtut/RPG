@@ -48,8 +48,14 @@ class Entity:
     def setTarget(self, target):
         if not self.current_action.needsTarget():
             return
-        else:
-            self.current_action.setTarget(target)
+
+        if not any(isinstance(target, t) for t in self.current_action.valid_target_types):
+            logger.warning(f"{self.getName()} tried to set an invalid target: {target.getName()}")
+            self.current_action.setTarget(None)  # Sécuriser
+            return
+
+        self.current_action.setTarget(target)
+
 
     # Renvoie une action au hasard ou retourne l'action courante si elle n'est pas terminée
     def getAction(self):

@@ -1,0 +1,17 @@
+[
+  {
+    "text": "C’est pas une pluie, c’est un châtiment divin.",
+    "conditions": ["weather == rainy"],
+    "priority": 10
+  },
+  {
+    "text": "Un ours rôde dans la vallée.",
+    "conditions": ["flag == seen_bear"],
+    "priority": 4
+  },
+  {
+    "text": "Rien à signaler.",
+    "conditions": [],
+    "priority": 1
+  }
+]

@@ -1,4 +1,4 @@
-from Actions.Action import Action
+from actions.Action import Action
 from EventManager import EventManager
 from random import randint
 

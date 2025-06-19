@@ -1,4 +1,4 @@
-from Actions.Action import Action
+from actions.Action import Action
 
 class AttackAction(Action):
     def __init__(self, name, rounds=0, description="", proc_chance=1, needs_target=True, valid_target_types=None):

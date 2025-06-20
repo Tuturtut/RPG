@@ -1,5 +1,5 @@
 from world.WorldState import WorldState
-from world.DialogueManager import DialogueManager
+from dialogue.DialogueManager import DialogueManager
 from core.GameContext import GameContext
 from core.TimeManager import TimeManager
 from entities.Player import Player

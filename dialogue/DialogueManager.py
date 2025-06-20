@@ -1,6 +1,6 @@
 import os
 import json
-from world.Dialogue import DialogueEntry
+from dialogue.Dialogue import DialogueEntry
 
 class DialogueManager:
     def __init__(self, dialogue_folder="data/dialogues"):

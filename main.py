@@ -1,119 +1,128 @@
 from core.Game import Game
-from world.Area import Area
-from world.Events import AreaEvent
-from core.GameContext import GameContext
-from entities.Human import Human
-from entities.Goblin import Goblin
 from entities.Player import Player
-from actions.AttackAction import AttackAction
-from combat.CombatManager import CombatManager
+from entities.Human import Human
+from world.Area import Area
+from world.Path import Path
+from world.PlayerPath import PlayerPath
+from events.MapDialogueEvent import MapDialogueEvent
+from events.MapFightEvent import MapFightEvent
+from dialogue.DialogueManager import DialogueManager
+from dialogue.Dialogue import DialogueEntry
 from entities.Entity import Entity
+from actions.AttackAction import AttackAction
 
-def create_test_area(game):
+def setup_world(game):
+    # ZONES
+    auberge = Area("Auberge de Bruneval", "Une auberge rustique au toit moussu.")
+    campement = Area("Campement abandonné", "Une tente déchirée et quelques braises encore chaudes.")
+    tour = Area("Ancienne Tour", "Un vieux bâtiment en ruine, recouvert de lierre.")
+    plaine = Area("Plaine Centrale", "Une étendue vallonnée battue par le vent.", subareas=[auberge, campement, tour])
+
+    # PERSONNAGES
     maruen = Human("Maruen")
     maruen.languages = ["human"]
+    maruen_dialogues = [
+        DialogueEntry("Rien à signaler.", priority=1),
+        DialogueEntry("On raconte qu’un bandit rôde dans les environs…", conditions=["flag == heard_bandit"], priority=5),
+        DialogueEntry("Il y a quelques jours, j’ai vu un cerf étrange dans la plaine.", conditions=["weather == sunny"], priority=3),
+    ]
+    for entry in maruen_dialogues:
+        maruen.add_dialogue(entry)
     game.dialogue_manager.register(maruen)
 
-    goblin = Goblin("Goblin")
-    attack_action = AttackAction("Attaquer", rounds=0, description="Attaque la cible", valid_target_types=[Entity])
-    player = Player("Arthur", health=100, damage=40, defense=2, actions=[attack_action])
-
-
-    auberge = Area("Auberge", "Une petite auberge à l’orée de la forêt.")
     auberge.add_entity(maruen)
-    auberge.add_entity(goblin)
+
+    # JOUEUR
+    player = Player("Arthur", health=100, damage=12, defense=6, 
+                    actions=[AttackAction("Attaquer", valid_target_types=[Entity])])
     auberge.add_entity(player)
+    game.player = player
+    game.current_area = plaine
 
-    def fuite_condition(ws, area):
-        return ws.weather.current == "rainy"
+    # PATHS
+    path_aub_camp = Path(auberge, campement, steps=4)
+    path_camp_tour = Path(campement, tour, steps=3)
 
-    def fuite_effet(ws, area):
-        print("[Événement] Une fuite s’écoule du plafond.")
-        GameContext.journal.add(ws.day, f"Fuite déclenchée dans {area.name}.")
-        for entity in area.entities:
-            if entity.name == "Maruen":
-                entity.mood = "grincheux"
-                GameContext.journal.add(ws.day, "Maruen est devenu grincheux.")
+    # Événement FIXE : cerf visible au pas 2
+    path_aub_camp.events[2] = MapDialogueEvent("Un cerf à la robe blanche surgit d’un bosquet, t’observant longuement.")
+    # Événement FIXE : attaque au pas 4
 
-    fuite = AreaEvent("fuite_toit", fuite_condition, fuite_effet)
-    auberge.add_event(fuite)
+    brigand = Entity("Brigand", health=50, damage=5, defense=2, actions=[AttackAction("Attaquer", valid_target_types=[Entity])])
+    path_aub_camp.events[4] = MapFightEvent(brigand)
 
-    return auberge
+    # Événements ALÉATOIRES
+    path_aub_camp.add_random_event(MapDialogueEvent("Des branches craquent au loin..."), weight=3)
+    brigand_affame = Entity("Brigand affamé", health=50, damage=8, defense=2, actions=[AttackAction("Attaquer")])
+    path_aub_camp.add_random_event(MapFightEvent(brigand_affame), weight=1)
 
-def game_loop(game):
-    area = game.current_area
-    player = [e for e in area.entities if isinstance(e, Player)][0]
+    return plaine
 
+def run_full_test():
+    game = Game()
+    game.world.weather.set_weather("sunny")  # météo fixe pour le test
+    game.world.add_flag("heard_bandit")      # active un dialogue
+
+    plaine = setup_world(game)
+
+    print(f"Bienvenue dans la région : {plaine.name}")
     while True:
-        print(f"\n=== {game.world.day}e jour — {game.time_manager.get_hours_minutes()} ({game.time_manager.get_time_of_day()}) ===")
-        print(f"Zone : {area.name}")
-        print("Que veux-tu faire ?")
+        location = game.player.location
+        print(f"\nLieu : {location.getFullName()}")
+        print(f"Description : {location.description}")
+        print(f"Heure : {game.time_manager.get_hours_minutes()} | Météo : {game.world.weather.current}")
 
-        print("1. Parler à quelqu’un")
-        print("2. Combattre une créature")
-        print("3. Attendre une heure")
-        print("4. Afficher le journal")
-        print("5. Quitter")
+        print("\nPersonnes présentes :")
+        for entity in location.entities:
+            if entity is not game.player:
+                print(f"- {entity.name} : '{entity.get_dialogue(game.world)}'")
+
+        print("\nQue voulez-vous faire ?")
+        print("1. Voir les chemins")
+        print("2. Se déplacer")
+        print("3. Quitter")
 
         choix = input("→ ")
 
         if choix == "1":
-            for entity in area.entities:
-                if entity is not player and hasattr(entity, "get_dialogue"):
-                    print(entity.get_dialogue(game.world, observer=player))
-            game.wait(5)
+            if not location.paths:
+                print("Aucun chemin ici.")
+            else:
+                print("Chemins disponibles :")
+                for i, (dest, path) in enumerate(location.paths.items()):
+                    print(f"{i+1}. Vers {dest.name} ({path.steps} pas)")
 
         elif choix == "2":
-            enemies = [e for e in area.entities if e != player and e.is_alive()]
-            if not enemies:
-                print("Il n’y a aucun ennemi vivant ici.")
+            destinations = list(location.paths.keys())
+            if not destinations:
+                print("Aucun chemin à emprunter.")
                 continue
 
-            for i, enemy in enumerate(enemies):
-                print(f"{i + 1}. {enemy.name} ({enemy.health} PV)")
-
+            print("Vers quelle destination ?")
+            for i, dest in enumerate(destinations):
+                print(f"{i+1}. {dest.name}")
             try:
-                i = int(input("Qui veux-tu combattre ? ")) - 1
-                if 0 <= i < len(enemies):
-                    CombatManager.start(player, [enemies[i]])
-                    if not enemies[i].is_alive():
-                        area.entities.remove(enemies[i])
-                        print(f"{enemies[i].name} a été vaincu.")
+                idx = int(input("Choix : ")) - 1
+                if 0 <= idx < len(destinations):
+                    destination = destinations[idx]
+                    path = location.paths[destination]
+                    print(f"\n→ Départ pour {destination.name} ({path.steps} pas).")
+
+                    ppath = PlayerPath(path)
+                    while True:
+                        input("Appuyez sur Entrée pour faire un pas...")
+                        if ppath.advance(game):
+                            break
                 else:
                     print("Choix invalide.")
             except ValueError:
-                print("Veuillez entrer un nombre.")
+                print("Entrée invalide.")
 
         elif choix == "3":
-            game.wait(60)
-
-        elif choix == "4":
-            game.journal.show()
-
-        elif choix == "5":
-            print("À bientôt.")
+            print("Fin de la session.")
             break
 
         else:
-            print("Choix invalide.")
-
-        area.check_events(game.world)
-
-def run():
-    game = Game()
-    game.world.weather.set_weather("rainy")
-    game.world.add_flag("seen_bear")
-
-    area = create_test_area(game)
-    game.add_area(area)
-    game.change_area(area.name)
-
-    # Affichage initial
-    area.describe()
-    area.check_events(game.world)
-
-    game_loop(game)
-
+            print("Choix inconnu.")
 
 if __name__ == "__main__":
-    run()
+    run_full_test()

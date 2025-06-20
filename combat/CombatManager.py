@@ -51,7 +51,6 @@ class CombatManager:
 
     
     def enemy_turn(self):
-        print(f" - {self.player.name} ({self.player.health} PV) [{type(self.player)}]")
         for enemy in self.current_enemies[:]:
             if enemy.is_alive():
                 action = enemy.getAction()

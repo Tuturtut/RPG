@@ -10,7 +10,7 @@ class DialogueEntry:
 
     @classmethod
     def from_json(cls, json_data):
-        from world.Dialogue import parse_condition_string
+        from dialogue.Dialogue import parse_condition_string
         text = json_data.get("text")
         raw_conditions = json_data.get("conditions", [])
         parsed_conditions = [parse_condition_string(c) for c in raw_conditions]

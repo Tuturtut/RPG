@@ -13,7 +13,10 @@ class Entity(Talkable):
         self.damage = damage
         self.defense = defense
         self.actions = actions
+        if actions is None:
+            actions = [NoneAction()]
         self.current_action = None
+        self.location = None
     
     def getName(self):
         return f"[{self.name}]"

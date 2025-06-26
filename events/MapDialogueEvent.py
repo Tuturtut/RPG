@@ -1,6 +1,13 @@
-class MapDialogueEvent:
-    def __init__(self, message):
-        self.message = message
+from events.Event import Event
+
+
+class MapDialogueEvent(Event):
+    def __init__(self, dialogue_message):
+        super().__init__(description="Dialogue simple")
+        self.dialogue_message = dialogue_message
+
+        self.message = None
 
     def execute(self, world_state, player):
-        print(f"[Événement] {self.message}")
+        self.message = f"[Événement] {self.dialogue_message}"
+        

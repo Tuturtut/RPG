@@ -10,6 +10,15 @@ class DialogueManager:
     def register(self, entity):
         self.entities[entity.name] = entity
         self.load_dialogues(entity)
+    
+    def add_dialogue(self, entity_name, dialogue_entry):
+        if entity_name not in self.entities:
+            print(f"[DM] Entité {entity_name} non enregistrée.")
+            return
+        
+        entity = self.entities[entity_name]
+        entity.add_dialogue(dialogue_entry)
+        self.save_dialogue(entity)
 
     def load_dialogues(self, entity):
         entity.dialogues.clear()  # on efface les anciens dialogues

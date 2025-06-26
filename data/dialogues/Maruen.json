@@ -13,5 +13,15 @@
     "text": "Rien à signaler.",
     "conditions": [],
     "priority": 1
+  },
+  {
+    "text": "On raconte qu’un bandit rôde dans les environs…",
+    "conditions": ["flag == heard_bandit"],
+    "priority": 5
+  },
+  {
+    "text": "Il y a quelques jours, j’ai vu un cerf étrange dans la plaine.",
+    "conditions": ["weather == sunny"],
+    "priority": 3
   }
 ]

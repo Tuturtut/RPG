@@ -3,7 +3,10 @@ from dialogue.DialogueManager import DialogueManager
 from core.GameContext import GameContext
 from core.TimeManager import TimeManager
 from entities.Player import Player
-from actions.Action import Action
+from actions.AttackAction import AttackAction
+from world.Area import Area
+from world.Path import Path
+from events.MapDialogueEvent import MapDialogueEvent
 
 class Game:
     def __init__(self):
@@ -14,6 +17,31 @@ class Game:
         self.current_area = None
         self.time_manager = TimeManager()
 
+    def set_player(self, player, starting_area):
+        self.player = player
+        starting_area.add_entity(player)
+        self.current_area = starting_area
+
+    def setup(self):
+        # Création des zones
+        village = Area("Village", "Un petit village calme.")
+        forest = Area("Forêt", "Une forêt dense et mystérieuse.")
+        mountain = Area("Montagne", "Une montagne enneigée.")
+
+        # Création des chemins
+        path1 = Path(village, forest, 50)
+        path2 = Path(forest, mountain, 3)
+
+        path2.add_event(1, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
+
+        # Ajout du joueur
+        player = Player("Héros", damage=10, health=100, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
+        self.set_player(player, village)
+
+        self.add_area(village)
+        self.add_area(forest)
+
+        self.current_area = village    
 
     def add_area(self, area):
         self.areas[area.name] = area

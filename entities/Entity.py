@@ -29,7 +29,6 @@ class Entity(Talkable):
         filled = int(length * current / max_hp)
         empty = length - filled
         return f"[{'█'*filled}{'░'*empty}] {current}/{max_hp}\n"
-
     
     def take_damage(self, damage):
         final_damage = max(0, damage - self.defense)

@@ -15,6 +15,11 @@ class Path:
     def add_random_event(self, event, weight=1):
         self.random_events.append((event, weight))
     
+    def add_event(self, step, event):
+        if step < 0 or step >= self.steps:
+            raise ValueError("Step must be within the range of the path.")
+        self.events[step] = event
+    
     def trigger_random_event(self, world_state, player):
         if not self.random_events:
             return

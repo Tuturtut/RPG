@@ -2,13 +2,18 @@ class PlayerPath:
     def __init__(self, path):
         self.path = path          # Le Path emprunté
         self.steps_done = 0       # Nombre de pas effectués
+        self.triggered_event = []
 
     def advance(self, game):
+        self.triggered_event = []
         self.steps_done += 1
         if self.steps_done in self.path.events:
             self.path.events[self.steps_done].execute(game.world, game.player)
+        
+        event = self.path.trigger_random_event(game.world, game.player)
+        if (event):
+            self.triggered_event.append(event)
 
-        self.path.trigger_random_event(game.world, game.player)
         game.wait(10)
 
         if self.steps_done >= self.path.steps:
@@ -21,8 +26,7 @@ class PlayerPath:
         return False
     
     def get_triggered_events(self):
-        triggered = []
         if self.steps_done in self.path.events:
-            triggered.append(self.path.events[self.steps_done])
-        return triggered
+            self.triggered_event.append(self.path.events[self.steps_done])
+        return self.triggered_event
 

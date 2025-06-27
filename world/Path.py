@@ -31,7 +31,7 @@ class Path:
                 acc += weight
                 if r <= acc:
                     event.execute(world_state, player)
-                    return
+                    return event
 
     def get_other_end(self, from_area):
         return self.end if from_area == self.start else self.start

@@ -10,6 +10,8 @@ class GameController:
     def render_zone(self):
         zone = self.game.current_area
         lines = [zone.name, "", zone.description, "", "Chemins disponibles :"]
+        for (dest, path) in zone.paths.items():
+            print(f"{dest.name} ({path.steps} pas)")
         for i, (dest, path) in enumerate(zone.paths.items(), start=1):
             lines.append(f"{i}. {dest.name} ({path.steps} pas)")
         return "\n".join(lines)
@@ -25,7 +27,7 @@ class GameController:
         # Retourne les 3 derniers messages ou un message par défaut
         if not self.messages:
             return "Aucun message à afficher."
-        return "\n".join(self.messages[-3:])
+        return "\n".join(self.messages[-5:])
 
     def get_available_paths(self):
         return list(self.game.current_area.paths.items())
@@ -44,7 +46,7 @@ class GameController:
     def advance_step(self):
         if self.current_path:
             arrived = self.current_path.advance(self.game)
-            triggered_events = self.current_path.get_triggered_events()  # méthode à ajouter
+            triggered_events = self.current_path.get_triggered_events()
             for event in triggered_events:
                 if event.message:
                     self.messages.append(event.message)

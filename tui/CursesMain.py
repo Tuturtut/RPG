@@ -16,7 +16,7 @@ def main(stdscr):
 
     # Dimensions
     height, width = stdscr.getmaxyx()
-    info_h, dialogue_h = 4, 5
+    info_h, dialogue_h = 7, 7
     zone_h = height - info_h - dialogue_h
 
     # Création des fenêtres
@@ -38,7 +38,7 @@ def main(stdscr):
         dialogue_win.clear(); dialogue_win.box()
 
         draw_multiline(info_win, controller.render_game_info().split("\n"), 10)
-        draw_multiline(zone_win, controller.render_zone().split("\n"), 10)
+        draw_multiline(zone_win, controller.render_zone().split("\n"), 20)
         draw_multiline(dialogue_win, controller.render_messages().split("\n"), 10)
 
 

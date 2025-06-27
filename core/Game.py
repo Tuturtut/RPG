@@ -7,6 +7,7 @@ from actions.AttackAction import AttackAction
 from world.Area import Area
 from world.Path import Path
 from events.MapDialogueEvent import MapDialogueEvent
+from entities.Monster import Monster
 
 class Game:
     def __init__(self):
@@ -27,12 +28,28 @@ class Game:
         village = Area("Village", "Un petit village calme.")
         forest = Area("Forêt", "Une forêt dense et mystérieuse.")
         mountain = Area("Montagne", "Une montagne enneigée.")
+        lake = Area("Lac", "Un lac tranquille.")
+        cave = Area("Caverne", "Une caverne sombre.")
+        hill = Area("Colline", "Une colline rocheuse.")
+        swamp = Area("Marais", "Un marais sombre.")
+
+        goblin_des_montagnes = Monster("Gobelin des Montagnes", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])
+        mountain.add_entity(goblin_des_montagnes)
 
         # Création des chemins
-        path1 = Path(village, forest, 50)
-        path2 = Path(forest, mountain, 3)
+        path1 = Path(village, forest, 10)
+        path2 = Path(forest, mountain, 8)
+        path3 = Path(mountain, lake, 6)
+        path4 = Path(lake, village, 5)
+        path5 = Path(mountain, cave, 4)
+        path7 = Path(lake, hill, 12)
+        path6 = Path(cave, lake, 100)
+        path7 = Path(hill, swamp, 10)
 
-        path2.add_event(1, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
+        path7.add_event(6, MapDialogueEvent("Un renard vous aborde."))
+
+        path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
+        path6.add_random_event(MapDialogueEvent("Vous entendez le loup, le renard, et la belette."))
 
         # Ajout du joueur
         player = Player("Héros", damage=10, health=100, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
@@ -40,6 +57,10 @@ class Game:
 
         self.add_area(village)
         self.add_area(forest)
+        self.add_area(mountain)
+        self.add_area(lake)
+        self.add_area(cave)
+        self.add_area(hill)
 
         self.current_area = village    
 

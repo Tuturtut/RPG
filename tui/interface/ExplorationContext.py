@@ -2,6 +2,10 @@ from tui.interface.InterfaceContext import InterfaceContext
 import curses
 from core.Game import Game
 from utils.InputManager import InputManager
+from tui.interface.CombatContext import CombatContext
+from combat.CombatManager import CombatManager
+from entities.Monster import Monster
+from actions.AttackAction import AttackAction
 
 class ExplorationContext(InterfaceContext):
     def __init__(self, controller):
@@ -11,6 +15,9 @@ class ExplorationContext(InterfaceContext):
         self.input_manager.register(ord(" "), "advance_step")
         for i in range(1, 6):
             self.input_manager.register(ord(str(i)), f"move_{i}")
+        
+        # TEMP
+        self.input_manager.register(ord("c"), "combat")
 
 
     def handle_input(self, key):
@@ -29,6 +36,14 @@ class ExplorationContext(InterfaceContext):
         elif action.startswith("move_"):
             index = int(action.split("_")[1])
             self.controller.move_to(index-1)
+
+        # TEMP
+        elif action == "combat":
+            player = self.controller.game.player
+            enemies = [Monster("Loup", 25, 7, 1, [AttackAction("Attaque")]) for i in range(5)]        
+            combat_manager = CombatManager(player, enemies)
+            self.controller.set_context(CombatContext(self.controller, combat_manager))
+
         else:
             self.controller.messages.append(f"Action non reconnue : {action}")
 

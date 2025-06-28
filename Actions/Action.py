@@ -17,32 +17,29 @@ class Action:
     def needsTarget(self):
         return self.needs_target
 
-    def execute(self, user):
+    def execute(self, user, messages=None):
         if self.rounds_left > 0:
-            print(f"{user.getName()} prepares {self.name} ({self.rounds_left} rounds left)")
+            if messages is not None:
+                messages.append(f"{user.getName()} prépare {self.name} ({self.rounds_left} tours restants).")
             self.setRoundsLeft(self.rounds_left - 1)
-            logger.debug(f"{user.getName()} is charging {self.name}: {self.rounds_left} rounds left")
             return
 
         if random.random() > self.proc_chance:
-            print(f"{user.getName()} failed to execute {self.name}")
+            if messages is not None:
+                messages.append(f"{user.getName()} échoue à exécuter {self.name}.")
             self.setRoundsLeft(self.rounds)
-            logger.debug(f"{user.getName()} failed {self.name}, resetting rounds to {self.rounds}")
             return
 
-        if self.needs_target:
-            if self.target is None:
-                print(f"{user.getName()} cannot perform {self.name} without a target")
-                self.setRoundsLeft(self.rounds)
-                logger.warning(f"{user.getName()} tried to perform {self.name} without a target")
-                return
-        else:
-            print(f"{user.getName()} performs {self.name}")
+        if self.needs_target and self.target is None:
+            if messages is not None:
+                messages.append(f"{user.getName()} ne peut pas faire {self.name} sans cible.")
+            self.setRoundsLeft(self.rounds)
+            return
 
-        self.perform(user)
-
+        self.perform(user, messages=messages)
         self.setRoundsLeft(self.rounds)
-        logger.debug(f"{user.getName()} executed {self.name}, rounds reset to {self.rounds}")
+
+
 
     def setRoundsLeft(self, rounds_left):
         self.rounds_left = rounds_left

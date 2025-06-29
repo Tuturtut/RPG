@@ -7,6 +7,7 @@ from actions.AttackAction import AttackAction
 from world.Area import Area
 from world.Path import Path
 from events.MapDialogueEvent import MapDialogueEvent
+from events.MapFightEvent import MapFightEvent
 from entities.Monster import Monster
 
 class Game:
@@ -49,7 +50,14 @@ class Game:
         path7.add_event(6, MapDialogueEvent("Un renard vous aborde."))
 
         path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
-        path6.add_random_event(MapDialogueEvent("Vous entendez le loup, le renard, et la belette."))
+        # path6.add_random_event(MapDialogueEvent("Vous entendez le loup, le renard, et la belette."))
+
+        slime = Monster("Slime",5,5,1,actions=[AttackAction("Saut gluant")])
+        path6.add_random_event(MapFightEvent(slime), weight=0.1)
+
+
+        wolf = Monster("Loup", 13, 20, 1, [AttackAction("Morsure", description="Croc Croc")])
+        path3.add_event(2, MapFightEvent(wolf))
 
         # Ajout du joueur
         player = Player("Héros", damage=10, health=100, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])

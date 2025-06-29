@@ -7,6 +7,5 @@ class MapFightEvent(Event):
         self.enemy = enemy
 
     def execute(self, world_state, player):
-        message = f"[Événement] Un {self.enemy.getName()} surgit du chemin !"
-        CombatManager.start(player, [self.enemy])
-        self.message = message
+        self.message = f"[Événement] Un {self.enemy.getName()} surgit du chemin !"
+        return {"type": "fight", "enemy": self.enemy}

@@ -153,7 +153,10 @@ class CombatContext:
                 zone_win.addstr(y + 2 + i, 4, f"{enemy.getName()}{marker}")
 
         elif self.state == "end":
+            from tui.interface.ExplorationContext import ExplorationContext
+
             zone_win.addstr(y + 1, 2, "Combat terminé. Appuyez sur q.")
+            self.controller.set_context(ExplorationContext(self.controller))
 
         # Dialogue/messages
         max_lines = dialogue_win.getmaxyx()[0] - 3

@@ -11,26 +11,22 @@ class ExplorationContext(InterfaceContext):
     def __init__(self, controller):
         super().__init__(controller)
         self.input_manager = InputManager()
-        self.input_manager.register(ord("q"), "quit")
-        self.input_manager.register(ord(" "), "advance_step")
+        self.input_manager.register(ord(" "), "move", "advance_step")
         for i in range(1, 6):
-            self.input_manager.register(ord(str(i)), f"move_{i}")
+            self.input_manager.register(ord(str(i)), "move", f"move_{i}")
+        self.state = "move"
 
     def handle_input(self, key):
         """Handle input for the exploration context."""
 
-        action = self.input_manager.get_action(key)
+        action = self.input_manager.get_action(key, self.state)
         if not action:
             self.controller.messages.append("Action non reconnue.")
             return
-
-        if action == "quit":
-            self.controller.messages.append("Sortie du jeu.")
-            return "quit"
-        elif action == "advance_step":
+        elif action.get("move") == "advance_step":
             self.controller.advance_step()
-        elif action.startswith("move_"):
-            index = int(action.split("_")[1])
+        elif action.get("move").startswith("move_"):
+            index = int(action.get("move").split("_")[1])
             self.controller.move_to(index-1)
         else:
             self.controller.messages.append(f"Action non reconnue : {action}")

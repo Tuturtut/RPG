@@ -9,6 +9,7 @@ from world.Path import Path
 from events.MapDialogueEvent import MapDialogueEvent
 from events.MapFightEvent import MapFightEvent
 from entities.Monster import Monster
+from entities.Human import Human
 
 class Game:
     def __init__(self):
@@ -52,15 +53,17 @@ class Game:
         path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
         # path6.add_random_event(MapDialogueEvent("Vous entendez le loup, le renard, et la belette."))
 
-        slime = Monster("Slime",5,5,1,actions=[AttackAction("Saut gluant")])
-        path6.add_random_event(MapFightEvent(slime), weight=0.1)
 
+        wolves =  [Monster("Loup", 13, 10, 1, [AttackAction("Morsure", description="Croc Croc")])
+                   for _ in range(2)]
 
-        wolf = Monster("Loup", 13, 20, 1, [AttackAction("Morsure", description="Croc Croc")])
-        path3.add_event(2, MapFightEvent(wolf))
+        path3.add_event(2, MapFightEvent(wolves))
+
+        attack1 = AttackAction("Attaque", description="Attaque de base")
+        attack2 = AttackAction("Attaque lourde", description="Attaque de base", rounds=1, additional_damage=5)
 
         # Ajout du joueur
-        player = Player("Héros", damage=10, health=100, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
+        player = Player("Héros", damage=30, health=100, defense=5, actions=[attack1, attack2])
         self.set_player(player, village)
 
         self.add_area(village)

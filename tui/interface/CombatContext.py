@@ -1,4 +1,5 @@
 from utils.InputManager import InputManager
+import curses
 
 class CombatContext:
     def __init__(self, controller, combat_manager):
@@ -13,18 +14,22 @@ class CombatContext:
 
         # Actions : mappe 1-5 → action_1 à action_5
         for i in range(1, 6):
-            self.input_manager.register(ord(str(i)), f"action_{i}")
+            self.input_manager.register(ord(str(i)), "choice_action" ,f"action_{i}")
 
         # Cible navigation
-        self.input_manager.register(ord("a"), "target_left")
-        self.input_manager.register(ord("e"), "target_right")
-        self.input_manager.register(ord("d"), "target_validate")
+        self.input_manager.register(curses.KEY_LEFT, "choice_action", "action_left")
+        self.input_manager.register(curses.KEY_RIGHT, "choice_action", "action_right")
+        self.input_manager.register(ord(" "), "choice_action", "action_validate")
+        self.input_manager.register(ord("\n"), "choice_action", "action_validate")
 
-        # Quitter
-        self.input_manager.register(ord("q"), "quit")
+        self.input_manager.register(curses.KEY_LEFT, "choice_target", "target_left")
+        self.input_manager.register(curses.KEY_RIGHT, "choice_target", "target_right")
+        self.input_manager.register(ord(" "), "choice_target", "target_validate")
+        self.input_manager.register(ord("\n"), "choice_target", "target_validate")
 
     def handle_input(self, key):
-        action_name = self.input_manager.get_action(key)
+        
+        action_name = self.input_manager.get_action(key, self.state)
 
         if action_name == "quit":
             self.state = "end"
@@ -45,39 +50,88 @@ class CombatContext:
             self.check_combat_end()
 
     def handle_action_choice(self, action_name):
-        if action_name and action_name.startswith("action_"):
-            index = int(action_name.split("_")[1])
-            self.selected_action_index = index - 1
-            selected_action = self.combat_manager.player.actions[self.selected_action_index]
+        actions = self.combat_manager.player.actions
+        if not actions:
+            self.controller.messages.append("Aucune action disponible.")
+            self.state = "end"
+            return
+        if (not action_name):
+            self.controller.messages.append("Action non reconnue.")
+            return
+        if action_name.get("choice_action") == "action_left":
+            self.selected_action_index = (self.selected_action_index - 1) % len(actions)
+        elif action_name.get("choice_action") == "action_right":
+            self.selected_action_index = (self.selected_action_index + 1) % len(actions)
+        elif action_name.get("choice_action") == "action_validate":
+            selected_action = actions[self.selected_action_index]
             self.controller.messages.append(f"Action choisie : {selected_action.name}")
 
             if selected_action.needsTarget():
                 self.state = "choice_target"
             else:
                 self.state = "execute_player"
+        elif action_name.get("choice_action").startswith("action_"):
+
+            index = int(action_name.get("choice_action").split("_")[1])
+            selected_action = actions[index-1]
+            self.controller.messages.append(f"Action choisie : {selected_action.name}")
+
+            if selected_action.needsTarget():
+                self.state = "choice_target"
+            else:
+                self.state = "execute_player"
+        
         else:
             self.controller.messages.append(f"Action non reconnue : {action_name}")
 
+
     def handle_target_choice(self, action_name):
+        """Handle input for the target choice state"""
+        
         enemies = self.combat_manager.current_enemies
         if not enemies:
             self.controller.messages.append("Aucun ennemi disponible.")
             self.state = "end"
             return
+        
+        if not action_name:
+            self.controller.messages.append("Cible non reconnue.")
+            return
 
-        if action_name == "target_left":
+        if action_name.get("choice_target") == "target_left":
             self.selected_target_index = (self.selected_target_index - 1) % len(enemies)
-        elif action_name == "target_right":
+        elif action_name.get("choice_target") == "target_right":
             self.selected_target_index = (self.selected_target_index + 1) % len(enemies)
-        elif action_name == "target_validate":
-            self.state = "execute_player"
+        elif action_name.get("choice_target") == "target_validate":
+            # Vérifiez si l'index sélectionné correspond à une entité valide
+            if self.selected_target_index < len(enemies) and enemies[self.selected_target_index].is_alive():
+                self.state = "execute_player"
+            else:
+                # Si l'entité est morte, mettez à jour l'index sélectionné pour pointer vers la prochaine entité valide
+                self.selected_target_index = next((i for i, enemy in enumerate(enemies) if enemy.is_alive()), None)
+                if self.selected_target_index is None:
+                    self.controller.messages.append("Aucun ennemi disponible.")
+                    self.state = "end"
+                else:
+                    self.state = "choice_target"
 
     def execute_player_turn(self):
         player = self.combat_manager.player
         action = player.actions[self.selected_action_index]
 
         if action.needsTarget():
-            target = self.combat_manager.current_enemies[self.selected_target_index]
+            # Vérifiez si l'index sélectionné correspond à une entité valide
+            if self.selected_target_index < len(self.combat_manager.current_enemies) and self.combat_manager.current_enemies[self.selected_target_index].is_alive():
+                target = self.combat_manager.current_enemies[self.selected_target_index]
+            else:
+                # Si l'entité est morte, mettez à jour l'index sélectionné pour pointer vers la prochaine entité valide
+                self.selected_target_index = next((i for i, enemy in enumerate(self.combat_manager.current_enemies) if enemy.is_alive()), None)
+                if self.selected_target_index is None:
+                    self.controller.messages.append("Aucun ennemi disponible.")
+                    self.state = "end"
+                    return
+                else:
+                    target = self.combat_manager.current_enemies[self.selected_target_index]
         else:
             target = None
 
@@ -143,19 +197,18 @@ class CombatContext:
         if self.state == "choice_action":
             zone_win.addstr(y + 1, 2, "Actions :")
             for i, action in enumerate(self.combat_manager.player.actions):
-                marker = " (choisie)" if i == self.selected_action_index else ""
+                marker = " <--" if i == self.selected_action_index else ""
                 zone_win.addstr(y + 2 + i, 4, f"{i+1}. {action.name}{marker}")
 
         elif self.state == "choice_target":
             zone_win.addstr(y + 1, 2, "Cibles :")
             for i, enemy in enumerate(self.combat_manager.current_enemies):
-                marker = " (cible)" if i == self.selected_target_index else ""
-                zone_win.addstr(y + 2 + i, 4, f"{enemy.getName()}{marker}")
+                marker = " <--" if i == self.selected_target_index else ""
+                zone_win.addstr(y + 2 + i, 4, f"{i+1}.{enemy.getName()}{marker}")
 
         elif self.state == "end":
             from tui.interface.ExplorationContext import ExplorationContext
 
-            zone_win.addstr(y + 1, 2, "Combat terminé. Appuyez sur q.")
             self.controller.set_context(ExplorationContext(self.controller))
 
         # Dialogue/messages

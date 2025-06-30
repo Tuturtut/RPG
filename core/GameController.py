@@ -66,5 +66,5 @@ class GameController:
     
     def handle_event_result(self, result):
         if result["type"] == "fight":
-            combat_manager = CombatManager(self.game.player, [result["enemy"]])
+            combat_manager = CombatManager(self.game.player, result["enemies"])
             self.set_context(CombatContext(self, combat_manager))

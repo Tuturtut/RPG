@@ -46,7 +46,6 @@ class Action:
         if self.rounds_left < 0:
             self.rounds_left = 0
         logger.debug(f"Rounds left for {self.name}: {self.rounds_left}")
-        print("Rounds left: " + str(self.rounds_left))
 
     def perform(self, user):
         raise NotImplementedError("Subclasses must implement perform()")

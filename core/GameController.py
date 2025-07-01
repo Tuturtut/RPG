@@ -43,6 +43,9 @@ class GameController:
             self.messages.append(f"Déplacement vers {dest.name} en cours...")
         else:
             self.messages.append(f"Chemin invalide.")
+    
+    def get_possible_moves(self):
+        return list(self.game.current_area.paths.keys())
 
     def advance_step(self):
         if self.current_path:

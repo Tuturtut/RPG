@@ -68,7 +68,7 @@ class GameController:
                     self.messages.append(event.message)
                 
                 result = event.execute(self.game.world, self.game.player)
-                if (result):
+                if result:
                     self.handle_event_result(result)
 
             if arrived:

@@ -2,6 +2,8 @@ import curses
 from core.Game import Game
 from core.GameController import GameController
 from tui.interface.ExplorationContext import ExplorationContext
+import traceback
+from utils.debug import log
 
 def startCurses():
     curses.wrapper(main)
@@ -25,7 +27,7 @@ def main(stdscr):
     height, width = stdscr.getmaxyx()
     info_h, dialogue_h = 7, 7
     zone_h = height - info_h - dialogue_h
-    debug_w = width // 4
+    debug_w = width // 3
 
     if DEBUG:
         windows_w = width - debug_w
@@ -39,12 +41,14 @@ def main(stdscr):
         debug_win = curses.newwin(height, debug_w, 0, windows_w)
 
     while True:
-
-        # Rendering
-        controller.context.render(info_win, zone_win, dialogue_win, debug_win if DEBUG else None)
-
-        key = stdscr.getch()
-        result = controller.context.handle_input(key)
-        if result is "quit":
-            controller.last_message = "Sortie du jeu."
-            break
+        try:
+            controller.context.render(info_win, zone_win, dialogue_win, debug_win if DEBUG else None)
+            key = stdscr.getch()
+            result = controller.context.handle_input(key)
+            if result == "quit":
+                break
+        except Exception:
+            if DEBUG and debug_win:
+                log(traceback.format_exc())
+            else:
+                raise

@@ -48,13 +48,12 @@ class Game:
         path6 = Path(cave, lake, 100)
         path7 = Path(hill, swamp, 10)
 
-        path1.add_event(4, MapFightEvent(enemy=Monster("Loup", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])))
+        path1.add_event(4, MapFightEvent([Monster("Loup", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])]))
 
 
         path7.add_event(6, MapDialogueEvent("Un renard vous aborde."))
 
         path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
-        # path6.add_random_event(MapDialogueEvent("Vous entendez le loup, le renard, et la belette."))
 
 
         wolves =  [Monster("Loup", 13, 20, 1, [AttackAction("Morsure", description="Croc Croc")])

@@ -8,7 +8,6 @@ class CombatContext(BaseContext):
     def __init__(self, controller, combat_manager):
         super().__init__(controller)
         self.combat_manager = combat_manager
-        self.input_manager = InputManager()
 
         self.state = "choice_action"
         self.action_selection = SelectionHelper(self.combat_manager.player.actions)
@@ -27,9 +26,7 @@ class CombatContext(BaseContext):
         self.input_manager.register(curses.KEY_RIGHT, "choice_target", "target_right")
         self.input_manager.register(ord(" "), "choice_target", "target_validate")
         self.input_manager.register(ord("\n"), "choice_target", "target_validate")
-
-    def handle_input(self, key):
-        action = self.input_manager.get_action(key, self.state)
+    def handle_input_contextual(self, action):
         if not action:
             self.controller.messages.append("Action non reconnue.")
             return

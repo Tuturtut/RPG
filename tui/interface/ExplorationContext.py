@@ -7,8 +7,6 @@ from utils.ui import draw_selection_list
 class ExplorationContext(BaseContext):
     def __init__(self, controller):
         super().__init__(controller)
-        self.input_manager = InputManager()
-
         self.state = "choice_direction"
         self.directions = self.controller.get_possible_moves()
         self.selection = SelectionHelper(self.directions)
@@ -24,8 +22,7 @@ class ExplorationContext(BaseContext):
         # Déplacement
         self.input_manager.register(ord(" "), "move", "advance_step")
 
-    def handle_input(self, key):
-        action = self.input_manager.get_action(key, self.state)
+    def handle_input_contextual(self, action):
         if not action:
             self.controller.messages.append("Action non reconnue.")
             return
@@ -42,12 +39,13 @@ class ExplorationContext(BaseContext):
             self.selection.move_right()
         elif action_name.get("choice_direction") == "direction_validate":
             self.start_move()
-        elif action_name.get("choice_direction").startswith("direction_"):
-            number = int(action_name.get("choice_direction").split("_")[1])
-            if self.selection.select_by_number(number):
-                self.start_move()
-            else:
-                self.controller.messages.append("Direction invalide.")
+        elif action_name.get("choice_direction"):
+            if action_name.get("choice_direction").startswith("direction_"):
+                number = int(action_name.get("choice_direction").split("_")[1])
+                if self.selection.select_by_number(number):
+                    self.start_move()
+                else:
+                    self.controller.messages.append("Direction invalide.")
 
     def start_move(self):
         selected_dest = self.selection.get_selected()
@@ -62,14 +60,11 @@ class ExplorationContext(BaseContext):
     def handle_move(self, action_name):
         if action_name.get("move") == "advance_step":
             self.controller.advance_step()
-            if not self.controller.current_path:
+            if not self.controller.game.player.current_path:
                 self.directions = self.controller.get_possible_moves()
                 self.selection = SelectionHelper(self.directions)
                 self.state = "choice_direction"
     
-    def render(self, info_win, zone_win, dialogue_win, debug_win=None):
-        """Render the exploration context."""
-
     def render_zone_content(self, zone_win):
         if self.state == "choice_direction":
             zone_win.addstr(1, 2, "Choisissez une direction :")
@@ -80,21 +75,6 @@ class ExplorationContext(BaseContext):
                 start_y=2
             )
 
-        if debug_win is not None:
-            debug_win.clear(); debug_win.box()
-
-        self.draw_multiline(info_win, self.controller.render_game_info().split("\n"), info_win.getmaxyx()[0])
-        self.draw_multiline(zone_win, self.controller.render_zone().split("\n"), zone_win.getmaxyx()[0])
-        self.draw_multiline(dialogue_win, self.controller.render_messages().split("\n"), dialogue_win.getmaxyx()[0])
-
-
-        info_win.refresh()
-        zone_win.refresh()
-        dialogue_win.refresh()
-
-        if debug_win is not None:
-            debug_win.addstr(1, 2, "ExplorationContext")
-            debug_win.refresh()
 
     def draw_multiline(self, win, lines, max_height):
         """Draw multiline text in a window, respecting the maximum height."""

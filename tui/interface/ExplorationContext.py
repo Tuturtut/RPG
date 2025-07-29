@@ -33,12 +33,15 @@ class ExplorationContext(InterfaceContext):
             self.controller.messages.append(f"Action non reconnue : {action}")
 
     
-    def render(self, info_win, zone_win, dialogue_win):
+    def render(self, info_win, zone_win, dialogue_win, debug_win=None):
         """Render the exploration context."""
 
         info_win.clear(); info_win.box()
         zone_win.clear(); zone_win.box()
         dialogue_win.clear(); dialogue_win.box()
+
+        if debug_win is not None:
+            debug_win.clear(); debug_win.box()
 
         self.draw_multiline(info_win, self.controller.render_game_info().split("\n"), info_win.getmaxyx()[0])
         self.draw_multiline(zone_win, self.controller.render_zone().split("\n"), zone_win.getmaxyx()[0])
@@ -48,6 +51,10 @@ class ExplorationContext(InterfaceContext):
         info_win.refresh()
         zone_win.refresh()
         dialogue_win.refresh()
+
+        if debug_win is not None:
+            debug_win.addstr(1, 2, "ExplorationContext")
+            debug_win.refresh()
 
     def draw_multiline(self, win, lines, max_height):
         """Draw multiline text in a window, respecting the maximum height."""

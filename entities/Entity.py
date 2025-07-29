@@ -17,6 +17,7 @@ class Entity(Talkable):
             actions = [NoneAction()]
         self.current_action = None
         self.location = None
+        self.current_path = None
     
     def getName(self):
         return f"[{self.name}]"
@@ -24,6 +25,18 @@ class Entity(Talkable):
     def __str__(self):
         return f"{self.getName()} {self.health_bar(self.health, self.max_health)}"
     
+    def start_path(self, path):
+        from world.EntityPath import EntityPath
+        self.current_path = EntityPath(path)
+    
+    def advance_path(self, game):
+        if self.current_path:
+            arrived = self.current_path.advance(game)
+            events = self.current_path.get_triggered_events()
+            if arrived:
+                self.current_path = None
+            return arrived, events
+        return False, []
 
     def health_bar(self, current, max_hp, length=20):
         filled = int(length * current / max_hp)
@@ -36,7 +49,6 @@ class Entity(Talkable):
         print(f"{self.getName()} takes {final_damage} damage!")
         print(self.health_bar(self.health, self.max_health))
         self.after_taking_damage()
-
 
     def after_taking_damage(self):
         pass

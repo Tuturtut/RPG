@@ -21,11 +21,14 @@ class CombatContext(InterfaceContext):
         # Ajouter d'autres commandes de combat ici
         return None
 
-    def render(self, info_win, zone_win, dialogue_win):
+    def render(self, info_win, zone_win, dialogue_win, debug_win=None):
         """ Affiche les informations du combat """
         info_win.clear(); info_win.box()
         zone_win.clear(); zone_win.box()
         dialogue_win.clear(); dialogue_win.box()
+
+        if debug_win is not None:
+            debug_win.clear(); debug_win.box()
 
         info_win.addstr(1, 2, "Combat en cours...")
         # Afficher les détails du combat ici
@@ -33,3 +36,7 @@ class CombatContext(InterfaceContext):
         info_win.refresh()
         zone_win.refresh()
         dialogue_win.refresh()
+
+        if debug_win is not None:
+            debug_win.addstr(1, 2, "CombatContext")
+            debug_win.refresh()

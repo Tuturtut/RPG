@@ -13,6 +13,16 @@ class Area:
     
     def add_connection(self, other_area, path):
         self.paths[other_area] = path
+    
+
+    def get_entities(self):
+        """
+        Retourne la liste des entitées présentes dans la zone.
+        """
+        return self.entities
+    
+    def get_other_entities(self, entity):
+        return [e for e in self.entities if e != entity]
 
     def add_entity(self, entity):
         self.entities.append(entity)

@@ -6,7 +6,6 @@ class GameController:
         self.game = game
         self.world = game.world
         self.messages = []
-        self.current_path = None
         self.context = None  # Sera défini au démarrage
 
     def set_context(self, context):
@@ -48,15 +47,15 @@ class GameController:
         paths = list(self.game.current_area.paths.items())
         if 0 <= index < len(paths):
             dest, path = paths[index]
-            self.current_path = PlayerPath(path)
+            self.game.player.start_path(path)
             self.messages.append(f"Déplacement vers {dest.name} en cours...")
         else:
             self.messages.append(f"Chemin invalide.")
 
     def advance_step(self):
-        if self.current_path:
-            arrived = self.current_path.advance(self.game)
-            triggered_events = self.current_path.get_triggered_events()
+        player = self.game.player
+        if player.current_path:
+            arrived, triggered_events = player.advance_path(self.game)
             for event in triggered_events:
                 if event.message:
                     self.messages.append(event.message)
@@ -65,6 +64,9 @@ class GameController:
                 self.messages.append(f"Arrivé à destination : {self.game.current_area.name}")
                 self.current_path = None
             else:
-                self.messages.append(f"Vous faites un pas... ({self.current_path.steps_done} / {self.current_path.path.steps})")
+                self.messages.append(f"Vous faites un pas... ({player.current_path.steps_done} / {player.current_path.path.steps})")
+
+            self.game.tick()
+
         else:
             self.messages.append("Aucun déplacement en cours.")

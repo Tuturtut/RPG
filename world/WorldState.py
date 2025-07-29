@@ -11,8 +11,6 @@ class WorldState:
         self.weather.set_weather()
         print(f"[Monde] Passage au jour {self.day} — météo : {self.weather.current}")
 
-
-
     def add_flag(self, flag):
         self.flags.add(flag)
 

@@ -7,6 +7,7 @@ from actions.AttackAction import AttackAction
 from world.Area import Area
 from world.Path import Path
 from events.MapDialogueEvent import MapDialogueEvent
+from events.MapFightEvent import MapFightEvent
 from entities.Monster import Monster
 from entities.Human import Human
 
@@ -47,6 +48,9 @@ class Game:
         path6 = Path(cave, lake, 100)
         path7 = Path(hill, swamp, 10)
 
+        path1.add_event(4, MapFightEvent(enemy=Monster("Loup", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])))
+
+
         path7.add_event(6, MapDialogueEvent("Un renard vous aborde."))
 
         path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
@@ -72,6 +76,21 @@ class Game:
         self.areas[area.name] = area
         if self.current_area is None:
             self.current_area = area  # première zone définie
+    
+    def tick(self):
+        # 1. Avance le temps
+        self.time_manager.advance_minutes(5)
+
+        # 2. Faire évoluer la météo
+        self.world.weather.update(self.time_manager)
+
+        # 3. Faire avancer les entités
+        for area in self.areas.values():
+            for entity in area.get_other_entities(self.player):
+
+                if entity.current_path:
+                    entity.advance_path(self)
+                
 
     def change_area(self, name):
         if name in self.areas:
@@ -82,6 +101,7 @@ class Game:
             print(f"[Erreur] Zone inconnue : {name}")
 
     def wait(self, minutes):
+
         day_changed = self.time_manager.advance_minutes(minutes)
         self.journal.add(self.world.day, f"Vous avez attendu {minutes} minutes.")
 

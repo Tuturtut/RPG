@@ -9,3 +9,5 @@ def draw_selection_list(*, win, items, selection_index, start_y=1, prefix_func=N
             win.addstr(start_y + i, 4, f"{prefix}{item}{marker}")
         except Exception:
             pass
+    
+    return start_y + len(items)

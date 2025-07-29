@@ -7,6 +7,12 @@ class MapFightEvent(Event):
         self.enemies = enemies
 
     def execute(self, world_state, player):
+        living_enemies = [enemy for enemy in self.enemies if enemy.is_alive()]
+
+        if not living_enemies:
+            self.message = "[Événement] Aucun ennemi vivant."
+            return None
+
         if (len(self.enemies) == 0):
             return
         elif (len(self.enemies) == 1):

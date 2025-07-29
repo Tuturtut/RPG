@@ -2,6 +2,7 @@ from core.Game import Game
 from world.PlayerPath import PlayerPath
 from tui.interface.CombatContext import CombatContext 
 from combat.CombatManager import CombatManager
+from tui.interface.ExplorationContext import ExplorationContext
 
 class GameController:
     def __init__(self, game):
@@ -10,6 +11,7 @@ class GameController:
         self.messages = []
         self.current_path = None
         self.context = None  # Sera défini au démarrage
+        self.exploration_context = ExplorationContext(self)
 
     def set_context(self, context):
         """ Change le contexte actif """

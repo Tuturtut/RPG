@@ -156,4 +156,4 @@ class CombatContext(BaseContext):
 
         elif self.state == "end":
             from tui.interface.ExplorationContext import ExplorationContext
-            self.controller.set_context(ExplorationContext(self.controller))
+            self.controller.set_context(self.controller.exploration_context)

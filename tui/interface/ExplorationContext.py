@@ -66,16 +66,23 @@ class ExplorationContext(BaseContext):
                 self.directions = self.controller.get_possible_moves()
                 self.selection = SelectionHelper(self.directions)
                 self.state = "choice_direction"
+    
+    def draw_entities(self, zone_win, y):
+        for entity in self.controller.game.current_area.entities:
+            zone_win.addstr(y, 4, entity.getName())
+            y += 1
 
     def render_zone_content(self, zone_win):
         if self.state == "choice_direction":
             zone_win.addstr(1, 2, "Choisissez une direction :")
-            draw_selection_list(
+            y = draw_selection_list(
                 win=zone_win,
                 items=[dest.name for dest in self.directions],
                 selection_index=self.selection.index,
                 start_y=2
             )
+
+            self.draw_entities(zone_win=zone_win, y=y);
 
         elif self.state == "move":
             zone_win.addstr(1, 2, "Déplacement en cours... Appuyez sur ESPACE pour avancer.")

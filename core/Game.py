@@ -8,6 +8,7 @@ from world.Area import Area
 from world.Path import Path
 from events.MapDialogueEvent import MapDialogueEvent
 from entities.Monster import Monster
+from entities.Human import Human
 
 class Game:
     def __init__(self):
@@ -54,6 +55,9 @@ class Game:
         # Ajout du joueur
         player = Player("Héros", damage=10, health=100, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
         self.set_player(player, village)
+
+        guts = Human("Guts", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
+        village.add_entity(guts)
 
         self.add_area(village)
         self.add_area(forest)

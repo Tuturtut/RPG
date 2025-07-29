@@ -25,6 +25,17 @@ class GameController:
         lines = [zone.name, "", zone.description, "", "Chemins disponibles :"]
         for i, (dest, path) in enumerate(zone.paths.items(), start=1):
             lines.append(f"{i}. {dest.name} ({path.steps} pas)")
+        
+        lines.append("\n")
+        
+        if zone.entities and zone.entities != [self.game.player]:
+            lines.append("Personnes présentes :")
+            for entity in zone.entities:
+                if entity != self.game.player:
+                    lines.append(f" - {entity.describe()}")
+        else:
+            lines.append("Il n'y a personne ici.")
+
         return "\n".join(lines)
 
     def render_messages(self):

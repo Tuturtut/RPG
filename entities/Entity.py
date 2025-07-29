@@ -87,3 +87,7 @@ class Entity(Talkable):
     def addAction(self, action):
         self.actions.append(action)
     
+
+    def describe(self):
+        return f"{self.name}"
+    

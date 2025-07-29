@@ -14,8 +14,6 @@ class Area:
     def add_connection(self, other_area, path):
         self.paths[other_area] = path
 
-
-
     def add_entity(self, entity):
         self.entities.append(entity)
         entity.location = self

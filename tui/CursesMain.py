@@ -19,7 +19,7 @@ def main(stdscr):
     game.setup()
     controller = GameController(game)
 
-    controller.set_context(ExplorationContext(controller))
+    controller.set_context(controller.exploration_context)
 
     # Dimensions
     height, width = stdscr.getmaxyx()

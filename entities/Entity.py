@@ -30,19 +30,25 @@ class Entity(Talkable):
         empty = length - filled
         return f"[{'█'*filled}{'░'*empty}] {current}/{max_hp}\n"
     
-    def take_damage(self, damage):
+    def take_damage(self, damage, messages=None):
         final_damage = max(0, damage - self.defense)
         self.health -= final_damage
-        print(f"{self.getName()} takes {final_damage} damage!")
-        print(self.health_bar(self.health, self.max_health))
-        self.after_taking_damage()
 
+        if messages is not None:
+            messages.append(f"{self.getName()} subit {final_damage} dégâts.")
+            messages.append(f"{self.getName()} HP : {self.health}/{self.max_health}")
+
+        if not self.is_alive() and messages is not None:
+            messages.append(f"{self.getName()} est vaincu !")
+
+        self.after_taking_damage()
 
     def after_taking_damage(self):
         pass
     
-    def use_action(self, action):
-        action.execute(self)
+    def use_action(self, action, messages=None):
+        action.execute(self, messages=messages)
+
     
     def is_injured(self):
         return self.health < self.max_health

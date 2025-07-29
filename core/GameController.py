@@ -1,5 +1,8 @@
 from core.Game import Game
 from world.PlayerPath import PlayerPath
+from tui.interface.CombatContext import CombatContext 
+from combat.CombatManager import CombatManager
+from tui.interface.ExplorationContext import ExplorationContext
 
 class GameController:
     def __init__(self, game):
@@ -8,6 +11,7 @@ class GameController:
         self.messages = []
         self.current_path = None
         self.context = None  # Sera défini au démarrage
+        self.exploration_context = ExplorationContext(self)
 
     def set_context(self, context):
         """ Change le contexte actif """
@@ -52,6 +56,9 @@ class GameController:
             self.messages.append(f"Déplacement vers {dest.name} en cours...")
         else:
             self.messages.append(f"Chemin invalide.")
+    
+    def get_possible_moves(self):
+        return list(self.game.current_area.paths.keys())
 
     def advance_step(self):
         if self.current_path:
@@ -60,6 +67,10 @@ class GameController:
             for event in triggered_events:
                 if event.message:
                     self.messages.append(event.message)
+                
+                result = event.execute(self.game.world, self.game.player)
+                if (result):
+                    self.handle_event_result(result)
 
             if arrived:
                 self.messages.append(f"Arrivé à destination : {self.game.current_area.name}")
@@ -68,3 +79,8 @@ class GameController:
                 self.messages.append(f"Vous faites un pas... ({self.current_path.steps_done} / {self.current_path.path.steps})")
         else:
             self.messages.append("Aucun déplacement en cours.")
+    
+    def handle_event_result(self, result):
+        if result["type"] == "fight":
+            combat_manager = CombatManager(self.game.player, result["enemies"])
+            self.set_context(CombatContext(self, combat_manager))

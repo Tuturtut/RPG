@@ -1,7 +1,7 @@
 class PlayerPath:
     def __init__(self, path):
-        self.path = path          # Le Path emprunté
-        self.steps_done = 0       # Nombre de pas effectués
+        self.path = path
+        self.steps_done = 0
         self.triggered_event = []
 
     def advance(self, game):
@@ -29,4 +29,3 @@ class PlayerPath:
         if self.steps_done in self.path.events:
             self.triggered_event.append(self.path.events[self.steps_done])
         return self.triggered_event
-

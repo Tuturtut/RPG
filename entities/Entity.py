@@ -2,8 +2,6 @@ import random
 from capabilities.Talkable import Talkable
 from actions.NoneAction import NoneAction
 
-from logger import logger
-
 class Entity(Talkable):
     def __init__(self, name, health, damage, defense, actions=None):
         super().__init__()
@@ -28,6 +26,8 @@ class Entity(Talkable):
     def start_path(self, path):
         from world.EntityPath import EntityPath
         self.current_path = EntityPath(path)
+        from utils.debug import log
+        log(f"Starting path {self.current_path}")
     
     def advance_path(self, game):
         if self.current_path:
@@ -74,7 +74,6 @@ class Entity(Talkable):
             return
 
         if not any(isinstance(target, t) for t in self.current_action.valid_target_types):
-            logger.warning(f"{self.getName()} tried to set an invalid target: {target.getName()}")
             self.current_action.setTarget(None)
             return
 
@@ -85,14 +84,11 @@ class Entity(Talkable):
     def getAction(self):
         if self.current_action is None:
             self.current_action = self.getRandomAction()
-            logger.debug(f"{self.getName()} selected new action: {self.current_action.name}")
             return self.current_action
         else:
             if self.current_action.rounds_left > 0:
-                logger.debug(f"{self.getName()} continues with action: {self.current_action.name}")
                 return self.current_action
             else:
-                logger.debug(f"{self.getName()} action finished: {self.current_action.name}")
                 return self.current_action
 
 

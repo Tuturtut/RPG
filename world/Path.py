@@ -35,3 +35,6 @@ class Path:
 
     def get_other_end(self, from_area):
         return self.end if from_area == self.start else self.start
+    
+    def __str__(self):
+        return f"Path from {self.start.name} to {self.end.name}"

@@ -45,10 +45,26 @@ def main(stdscr):
             controller.context.render(info_win, zone_win, dialogue_win, debug_win if DEBUG else None)
             key = stdscr.getch()
             result = controller.context.handle_input(key)
+
             if result == "quit":
                 break
         except Exception:
+            error_text = traceback.format_exc()
             if DEBUG and debug_win:
-                log(traceback.format_exc())
+                log(error_text)
+
+                debug_win.clear()
+                debug_win.box()
+                for i, line in enumerate(error_text.splitlines()[-debug_win.getmaxyx()[0]+2:]):
+                    try:
+                        debug_win.addstr(i + 1, 1, line[:debug_win.getmaxyx()[1]-2])
+                    except Exception:
+                        pass
+                debug_win.refresh()
+
+                while True:
+                    key = stdscr.getch()
+                    if key == ord("q"):
+                        break
             else:
                 raise

@@ -20,7 +20,8 @@ class GameController:
         return (
             f"Jour {self.world.day} - {self.game.time_manager.get_time_of_day()} "
             f"({self.game.time_manager.get_hours_minutes()})\n"
-            f"Météo : {self.world.weather.current}"
+            f"Météo : {self.world.weather.current}\n"
+            f"Zone : {self.game.current_area.name}"
         )
 
     def render_zone(self):

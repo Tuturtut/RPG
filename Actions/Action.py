@@ -1,5 +1,4 @@
 import random
-from logger import logger  # Ajouté pour le logging
 
 class Action:
     def __init__(self, name, rounds, target=None, description="", proc_chance=1, usable=True, needs_target=True, valid_target_types=None):
@@ -12,7 +11,6 @@ class Action:
         self.usable = usable
         self.needs_target = needs_target
         self.valid_target_types = valid_target_types if valid_target_types is not None else []
-        logger.debug(f"Action created: {self.name}, needs_target={self.needs_target}, rounds={self.rounds}")
 
     def needsTarget(self):
         return self.needs_target
@@ -45,7 +43,6 @@ class Action:
         self.rounds_left = rounds_left
         if self.rounds_left < 0:
             self.rounds_left = 0
-        logger.debug(f"Rounds left for {self.name}: {self.rounds_left}")
 
     def perform(self, user):
         raise NotImplementedError("Subclasses must implement perform()")
@@ -53,7 +50,6 @@ class Action:
     def setTarget(self, target):
         if self.rounds_left == self.rounds:
             self.target = target
-            logger.debug(f"Target set for {self.name}: {self.target}")
 
     def __str__(self):
         return self.name

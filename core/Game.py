@@ -6,6 +6,7 @@ from entities.Player import Player
 from actions.AttackAction import AttackAction
 from world.Area import Area
 from world.Path import Path
+from world.EntityPath import EntityPath
 from events.MapDialogueEvent import MapDialogueEvent
 from events.MapFightEvent import MapFightEvent
 from entities.Monster import Monster
@@ -71,7 +72,11 @@ class Game:
         self.set_player(player, village)
 
         guts = Human("Guts", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
+        guts.current_path = EntityPath(path5)
         village.add_entity(guts)
+
+        villager = Human("Villager", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
+        village.add_entity(villager)
 
         self.add_area(village)
         self.add_area(forest)
@@ -100,7 +105,6 @@ class Game:
 
                 if entity.current_path:
                     entity.advance_path(self)
-                
 
     def change_area(self, name):
         if name in self.areas:

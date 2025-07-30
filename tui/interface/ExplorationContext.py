@@ -66,15 +66,26 @@ class ExplorationContext(BaseContext):
                 self.state = "choice_direction"
     
     def render_zone_content(self, zone_win):
+        y = 0
         if self.state == "choice_direction":
             zone_win.addstr(1, 2, "Choisissez une direction :")
-            y = draw_selection_list(
+            y += draw_selection_list(
                 win=zone_win,
                 items=[dest.name for dest in self.directions],
                 selection_index=self.selection.index,
                 start_y=2
             )
-
+        
+        # Affiche les entités dans la zone
+        y += 1
+        if (self.controller.game.current_area.get_other_entities(self.controller.game.player) == []):
+            zone_win.addstr(y, 2, "Il n'y a personne ici.")
+        else:
+            zone_win.addstr(y, 2, "Personnes dans la zone :")
+        y += 1
+        for entity in self.controller.game.current_area.get_other_entities(self.controller.game.player):
+            zone_win.addstr(y, 2, f"    - {entity.name}")
+            y += 1
 
     def draw_multiline(self, win, lines, max_height):
         """Draw multiline text in a window, respecting the maximum height."""

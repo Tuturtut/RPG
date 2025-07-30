@@ -10,6 +10,10 @@ class EntityPath:
         return self.triggered_event
     
     def advance(self, game):
+
+        from utils.debug import log
+        log(f"Advancing path {self}, steps done: {self.steps_done}")
+
         self.triggered_event = []
         self.steps_done += 1
         if self.steps_done in self.path.events:
@@ -28,3 +32,6 @@ class EntityPath:
             game.current_area = destination 
             return True
         return False
+    
+    def __str__(self):
+        return f"{self.path}"

@@ -124,13 +124,13 @@ class CombatContext(BaseContext):
         y = 2 + len(hp_lines) + 1
         zone_win.addstr(y, 2, "Ennemis :")
         y += 1
-        for enemy in self.combat_manager.current_enemies:
-            zone_win.addstr(y, 4, enemy.getName())
-            hp_lines = enemy.health_bar(enemy.health, enemy.max_health).splitlines()
-            for hp_line in hp_lines:
-                y += 1
-                zone_win.addstr(y, 6, hp_line)
-            y += 1
+        y = draw_selection_list(
+                win=zone_win,
+                items=[f"{e.getName()}\n\t{e.health_bar(e.health, e.max_health)}" for e in self.target_selection.items],
+                selection_index=self.target_selection.index,
+                start_y=y + 1,
+                has_marker=self.state == "choice_target"
+            )
 
 
         if self.state == "choice_action":
@@ -139,15 +139,6 @@ class CombatContext(BaseContext):
                 win=zone_win,
                 items=[a.name for a in self.combat_manager.player.actions],
                 selection_index=self.action_selection.index,
-                start_y=y + 1
-            )
-
-        elif self.state == "choice_target":
-            zone_win.addstr(y, 2, "Cibles :")
-            draw_selection_list(
-                win=zone_win,
-                items=[e.getName() for e in self.target_selection.items],
-                selection_index=self.target_selection.index,
                 start_y=y + 1
             )
 

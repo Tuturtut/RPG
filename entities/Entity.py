@@ -41,7 +41,7 @@ class Entity(Talkable):
     def health_bar(self, current, max_hp, length=20):
         filled = int(length * current / max_hp)
         empty = length - filled
-        return f"[{'█'*filled}{'░'*empty}] {current}/{max_hp}\n"
+        return f"[{'█'*filled}{'░'*empty}] {current}/{max_hp}"
     
     def take_damage(self, damage, messages=None):
         final_damage = max(0, damage - self.defense)

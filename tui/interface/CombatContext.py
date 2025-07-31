@@ -5,9 +5,11 @@ from utils.helpers.SelectionHelper import SelectionHelper
 from utils.ui import draw_selection_list
 
 class CombatContext(BaseContext):
-    def __init__(self, controller, combat_manager):
+    def __init__(self, controller, combat_manager, calling_context=None):
         super().__init__(controller)
         self.combat_manager = combat_manager
+
+        self.calling_context = calling_context
 
         self.state = "choice_action"
         self.action_selection = SelectionHelper(self.combat_manager.player.actions)
@@ -143,5 +145,9 @@ class CombatContext(BaseContext):
             )
 
         elif self.state == "end":
+            if (self.calling_context):
+                self.controller.set_context(self.calling_context)
+                return
+            
             from tui.interface.ExplorationContext import ExplorationContext
             self.controller.set_context(self.controller.exploration_context)

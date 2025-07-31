@@ -1,6 +1,7 @@
 import curses
 from utils.InputManager import InputManager
 from tui.interface.BaseContext import BaseContext
+from tui.interface.WalkingContext import WalkingContext
 from utils.helpers.SelectionHelper import SelectionHelper
 from utils.ui import draw_selection_list
 
@@ -53,7 +54,7 @@ class ExplorationContext(BaseContext):
             self.controller.messages.append(f"Déplacement vers {selected_dest.name}...")
             index = self.selection.index
             self.controller.move_to(index)
-            self.state = "move"
+            self.controller.set_context(WalkingContext(self.controller))
         else:
             self.controller.messages.append("Aucune direction sélectionnée.")
 

@@ -13,6 +13,9 @@ class EntityPath:
     def get_steps_done(self):
         return self.steps_done
     
+    def get_name(self):
+        return self.path.get_name()
+    
     def advance(self, game):
         self.triggered_event = []
         self.steps_done += 1

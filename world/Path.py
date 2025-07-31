@@ -20,7 +20,7 @@ class Path:
             raise ValueError("Step must be within the range of the path.")
         self.events[step] = event
     
-    def trigger_random_event(self, world_state, player):
+    def trigger_random_event(self, world_state, entity):
         if not self.random_events:
             return
         if random.random() < self.random_chance:
@@ -30,7 +30,7 @@ class Path:
             for event, weight in self.random_events:
                 acc += weight
                 if r <= acc:
-                    event.execute(world_state, player)
+                    event.execute(world_state, entity)
                     return event
 
     def get_other_end(self, from_area):

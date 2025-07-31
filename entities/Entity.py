@@ -23,9 +23,19 @@ class Entity(Talkable):
     def __str__(self):
         return f"{self.getName()} {self.health_bar(self.health, self.max_health)}"
     
+    def get_current_path(self):
+        return self.current_path
+
+    def is_player(self):
+        from entities.Player import Player
+
+        if isinstance(self, Player):
+            return True
+        return False
+
     def start_path(self, path):
         from world.EntityPath import EntityPath
-        self.current_path = EntityPath(path)
+        self.current_path = EntityPath(self, path)
         from utils.debug import log
         log(f"Starting path {self.current_path}")
     

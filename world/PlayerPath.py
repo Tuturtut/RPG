@@ -1,6 +1,6 @@
 from world.EntityPath import EntityPath
 
 class PlayerPath(EntityPath):
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, player, path):
+        super().__init__(player, path)
     

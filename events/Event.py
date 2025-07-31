@@ -3,5 +3,5 @@ class Event:
         self.message = None 
         self.description = description
 
-    def execute(self, world_state, player):
+    def execute(self, world_state, entity):
         self.message = (f"[Événement] {self.message}")

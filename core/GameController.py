@@ -1,5 +1,4 @@
 from core.Game import Game
-from world.PlayerPath import PlayerPath
 from tui.interface.CombatContext import CombatContext 
 from combat.CombatManager import CombatManager
 from tui.interface.ExplorationContext import ExplorationContext

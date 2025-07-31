@@ -25,12 +25,9 @@ def debug_dialogue_selection(self, world_state):
         valid_dialogues = [d for d in self.dialogues if d.is_available(self, world_state)]
 
         if not valid_dialogues:
-            print(f"\n[DEBUG] {self.name} : Aucun dialogue valide.")
             return
 
-        print(f"\n[DEBUG] {self.name} : Dialogues valides trouvés :")
         for d in valid_dialogues:
             print(f"  - Priorité {d.priority} → \"{d.text}\"")
 
         best = max(valid_dialogues, key=lambda d: d.priority)
-        print(f"\n[DEBUG] Dialogue choisi (priorité {best.priority}) : \"{best.text}\"")

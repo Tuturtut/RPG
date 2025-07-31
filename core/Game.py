@@ -72,7 +72,7 @@ class Game:
         self.set_player(player, village)
 
         guts = Human("Guts", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
-        guts.current_path = EntityPath(path5)
+        guts.current_path = EntityPath(guts, path5)
         village.add_entity(guts)
 
         villager = Human("Villager", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
@@ -105,6 +105,13 @@ class Game:
 
                 if entity.current_path:
                     entity.advance_path(self)
+                    from utils.debug import log
+                    path = entity.get_current_path()
+                    if path:
+                        log(f"P [{entity.name}] : {path}, STEPS: {path.get_steps_done()}")
+                    else:
+                        log(f"P [{entity.name}] : Aucun chemin actif.")
+
 
     def change_area(self, name):
         if name in self.areas:

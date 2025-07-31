@@ -6,8 +6,11 @@ class MapFightEvent(Event):
         super().__init__("Combat imminent")
         self.enemies = enemies
 
-    def execute(self, world_state, player):
+    def execute(self, world_state, entity):
         living_enemies = [enemy for enemy in self.enemies if enemy.is_alive()]
+
+        if not entity.is_player():
+            return
 
         if not living_enemies:
             self.message = "[Événement] Aucun ennemi vivant."

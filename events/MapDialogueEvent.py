@@ -8,6 +8,8 @@ class MapDialogueEvent(Event):
 
         self.message = None
 
-    def execute(self, world_state, player):
-        self.message = f"[Événement] {self.dialogue_message}"
+    def execute(self, world_state, entity):
+        # if entity instanceof Player:
+        if entity.is_player():
+            self.message = f"[Événement] {self.dialogue_message}"
         

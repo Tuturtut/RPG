@@ -48,6 +48,7 @@ class Game:
         path7 = Path(lake, hill, 12)
         path6 = Path(cave, lake, 100)
         path7 = Path(hill, swamp, 10)
+        
 
         path1.add_event(4, MapFightEvent([Monster("Loup", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])]))
 
@@ -57,18 +58,18 @@ class Game:
         path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
 
 
-        wolves =  [Monster("Loup", 13, 20, 1, [AttackAction("Morsure", description="Croc Croc")])
+        wolves =  [Monster("Loup", 35, 12, 1, [AttackAction("Morsure", description="Croc Croc")])
                    for _ in range(4)]
 
         path3.add_event(2, MapFightEvent(wolves))
 
 
         attack1 = AttackAction("Attaque", description="Attaque de base")
-        attack2 = AttackAction("Attaque lourde", description="Attaque de base", rounds=1, additional_damage=5)
+        attack2 = AttackAction("Attaque lourde", description="Attaque de base", rounds=1, additional_damage=8)
 
 
         # Ajout du joueur
-        player = Player("Héros", damage=30, health=100, defense=5, actions=[attack1, attack2])
+        player = Player("Héros", damage=30, health=100, defense=6, actions=[attack1, attack2])
         self.set_player(player, village)
 
         guts = Human("Guts", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
@@ -94,7 +95,8 @@ class Game:
     
     def tick(self):
         # 1. Avance le temps
-        self.time_manager.advance_minutes(5)
+        if self.time_manager.advance_minutes(10):
+            self.world.day = self.time_manager.get_day()
 
         # 2. Faire évoluer la météo
         self.world.weather.update(self.time_manager)

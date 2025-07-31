@@ -57,8 +57,8 @@ class ExplorationContext(BaseContext):
         else:
             self.controller.messages.append("Aucune direction sélectionnée.")
 
-    def handle_move(self, action_name):
-        if action_name.get("move") == "advance_step":
+    def handle_move(self, action):
+        if action.get("move") == "advance_step":
             self.controller.advance_step()
             if not self.controller.game.player.current_path:
                 self.directions = self.controller.get_possible_moves()

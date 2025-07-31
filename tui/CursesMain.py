@@ -29,6 +29,9 @@ def main(stdscr):
     zone_h = height - info_h - dialogue_h
     debug_w = width // 3
 
+    from utils.debug import log
+    log(f"Width: {width}, Height: {height}")
+
     if DEBUG:
         windows_w = width - debug_w
     else:
@@ -37,6 +40,10 @@ def main(stdscr):
     info_win = curses.newwin(info_h, windows_w, 0, 0)
     zone_win = curses.newwin(zone_h, windows_w, info_h, 0)
     dialogue_win = curses.newwin(dialogue_h, windows_w, info_h + zone_h, 0)
+    
+    from utils.debug import log
+    log(f"Windows_w: {windows_w}, debug_w: {debug_w}")
+    
     if DEBUG:
         debug_win = curses.newwin(height, debug_w, 0, windows_w)
 

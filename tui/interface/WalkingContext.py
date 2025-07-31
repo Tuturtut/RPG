@@ -24,8 +24,28 @@ class WalkingContext(BaseContext):
                 self.controller.set_context(ExplorationContext(self.controller))
 
     def render_zone_content(self, zone_win):
-        y = 0
-    
+
+        height, width = zone_win.getmaxyx()
+        steps_done = self.controller.game.player.current_path.steps_done
+        steps = self.controller.game.player.current_path.path.steps
+
+        from utils.debug import log
+        log(f"Width: {width}, Height: {height}")
+
+        progress_bar_width = width - 15
+
+        y = 1
+        # Afficher une barre de progression
+        progress = int((steps_done / steps) * 100)
+        zone_win.addstr(y, 2, f"Progression : {progress}%")
+        filled = int(progress_bar_width * steps_done / steps)
+        empty = progress_bar_width - filled
+        y += 1
+
+        zone_win.addstr(y, 2, f"[{'█'*filled}{'░'*empty}] {steps_done}/{steps}")
+
+        y += 1
+
         # Affiche les infos sur le chemin en cours, si il y en a un
         if self.controller.game.player.current_path:
             zone_win.addstr(y, 2, "Chemin en cours :")

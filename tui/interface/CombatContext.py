@@ -28,6 +28,7 @@ class CombatContext(BaseContext):
         self.input_manager.register(curses.KEY_RIGHT, "choice_target", "target_right")
         self.input_manager.register(ord(" "), "choice_target", "target_validate")
         self.input_manager.register(ord("\n"), "choice_target", "target_validate")
+    
     def handle_input_contextual(self, action):
         if not action:
             self.controller.messages.append("Action non reconnue.")

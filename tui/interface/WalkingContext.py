@@ -42,7 +42,7 @@ class WalkingContext(BaseContext):
         empty = progress_bar_width - filled
         y += 1
 
-        zone_win.addstr(y, 2, f"[{'█'*filled}{'░'*empty}] {steps_done}/{steps}")
+        zone_win.addstr(y, 2, f"[{'_'*filled}|{'_'*empty}] {steps_done}/{steps}")
 
         y += 1
 

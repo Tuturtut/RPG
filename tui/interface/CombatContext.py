@@ -150,5 +150,4 @@ class CombatContext(BaseContext):
                 self.controller.set_context(self.calling_context)
                 return
             
-            from tui.interface.ExplorationContext import ExplorationContext
             self.controller.set_context(self.controller.exploration_context)

@@ -60,7 +60,7 @@ class ExplorationContext(BaseContext):
 
     def handle_move(self, action):
         if action.get("move") == "advance_step":
-            self.controller.advance_step()
+            self.controller.game.tick()
             if not self.controller.game.player.current_path:
                 self.directions = self.controller.get_possible_moves()
                 self.selection = SelectionHelper(self.directions)

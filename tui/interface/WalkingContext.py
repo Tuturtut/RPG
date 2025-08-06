@@ -18,7 +18,7 @@ class WalkingContext(BaseContext):
     
     def handle_move(self, action):
         if action.get("move") == "advance_step":
-            self.controller.advance_step()
+            self.controller.game.tick()
             if not self.controller.game.player.current_path:
                 from tui.interface.ExplorationContext import ExplorationContext
                 self.controller.set_context(ExplorationContext(self.controller))
@@ -28,9 +28,6 @@ class WalkingContext(BaseContext):
         height, width = zone_win.getmaxyx()
         steps_done = self.controller.game.player.current_path.steps_done
         steps = self.controller.game.player.current_path.path.steps
-
-        from utils.debug import log
-        log(f"Width: {width}, Height: {height}")
 
         progress_bar_width = width - 15
 

@@ -1,4 +1,3 @@
-from core.Game import Game
 from tui.interface.CombatContext import CombatContext 
 from combat.CombatManager import CombatManager
 from tui.interface.ExplorationContext import ExplorationContext
@@ -47,42 +46,40 @@ class GameController:
         return "\n".join(self.messages[-5:])
 
     def move_to(self, index):
-        self.messages.append(f"Index: {index}")
         paths = list(self.game.current_area.paths.items())
         if 0 <= index < len(paths):
             dest, path = paths[index]
-            self.game.player.start_path(path)
+            self.game.player.start_path(path, dest)
             self.messages.append(f"Déplacement vers {dest.name} en cours...")
         else:
             self.messages.append(f"Chemin invalide.")
     
     def get_possible_moves(self):
         return list(self.game.current_area.paths.keys())
+        
+    def handle_event_result(self, result):
+        type_ = result.get("type")
+        message = result.get("message")
 
-    def advance_step(self):
-        player = self.game.player
-        if player.current_path:
-            arrived, triggered_events = player.advance_path(self.game)
-            for event in triggered_events:
-                if event.message:
-                    self.messages.append(event.message)
-                
-                result = event.execute(self.game.world, self.game.player)
-                if result:
-                    self.handle_event_result(result)
+        if type_ == "info":
+            self.display_message(message)
 
-            if arrived:
-                self.messages.append(f"Arrivé à destination : {self.game.current_area.name}")
-                self.current_path = None
-            else:
-                self.messages.append(f"Vous faites un pas... ({player.current_path.steps_done} / {player.current_path.path.steps})")
+        elif type_ == "dialogue":
+            self.display_dialogue(message)
 
-            self.game.tick()
+        elif type_ == "fight":
+            self.start_fight(result["triggers"] ,result["enemies"], message)
 
         else:
-            self.messages.append("Aucun déplacement en cours.")
-    
-    def handle_event_result(self, result):
-        if result["type"] == "fight":
-            combat_manager = CombatManager(self.game.player, result["enemies"])
-            self.set_context(CombatContext(self, combat_manager, self.context))
+            self.display_message(f"(Événement inconnu) {message}")
+
+    def display_message(self, message):
+        self.messages.append(message)
+
+    def display_dialogue(self, message):
+        self.messages.append(f"Dialogue : {message}")
+
+    def start_fight(self, triggers, enemies, message):
+        from utils.debug import log
+        log(f"Starting fight with {enemies} and {triggers}")
+        self.set_context(CombatContext(self, CombatManager(self.game.player, enemies), self.context))

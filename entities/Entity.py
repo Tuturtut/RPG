@@ -11,10 +11,10 @@ class Entity(Talkable):
         self.damage = damage
         self.defense = defense
         self.actions = actions
+        self.location = None
         if actions is None:
             actions = [NoneAction()]
         self.current_action = None
-        self.location = None
         self.current_path = None
     
     def getName(self):
@@ -26,26 +26,26 @@ class Entity(Talkable):
     def get_current_path(self):
         return self.current_path
 
-    def is_player(self):
-        from entities.Player import Player
 
-        if isinstance(self, Player):
-            return True
-        return False
-
-    def start_path(self, path):
-        from world.EntityPath import EntityPath
-        self.current_path = EntityPath(self, path)
+    def start_path(self, path, destination):
+        from world.locations.EntityPath import EntityPath
+        self.current_path = EntityPath(self, path, path.get_other_end(destination))
+        self.location = self.current_path.path
+ 
+    def advance_path(self, game, controller):
         from utils.debug import log
-        log(f"Starting path {self.current_path}")
-    
-    def advance_path(self, game):
+        log(f"{self.getName()} va vers {self.location}")
+        log(f"events: {self.location.events}")
+        self.location.trigger_events(self, controller)
+
         if self.current_path:
             arrived = self.current_path.advance(game)
-            events = self.current_path.get_triggered_events()
             if arrived:
+                log(f"{self.getName()} arrived at {self.location}")
+                self.location = self.current_path.path.end
+                self.location.trigger_events(self, controller)
                 self.current_path = None
-            return arrived, events
+            return arrived
         return False, []
 
     def health_bar(self, current, max_hp, length=20):
@@ -71,7 +71,6 @@ class Entity(Talkable):
     
     def use_action(self, action, messages=None):
         action.execute(self, messages=messages)
-
     
     def is_injured(self):
         return self.health < self.max_health

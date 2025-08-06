@@ -4,6 +4,7 @@ from core.GameController import GameController
 from tui.interface.ExplorationContext import ExplorationContext
 import traceback
 from utils.debug import log
+from core.GameContext import GameContext
 
 def startCurses():
     curses.wrapper(main)
@@ -19,7 +20,9 @@ def main(stdscr):
     # Init game + controller
     game = Game()
     game.setup()
-    controller = GameController(game)
+
+    controller = GameContext.get_game_controller(game)
+    
 
     controller.set_context(controller.exploration_context)
 
@@ -27,25 +30,29 @@ def main(stdscr):
     height, width = stdscr.getmaxyx()
     info_h, dialogue_h = 7, 7
     zone_h = height - info_h - dialogue_h
-    debug_w = width // 3
+    debug_w = width // 2
 
-    from utils.debug import log
-    log(f"Width: {width}, Height: {height}")
+    # Position
+    debug_pos = "left"
+    x_pos = 0
 
     if DEBUG:
         windows_w = width - debug_w
     else:
         windows_w = width
+
     # Fenêtres
-    info_win = curses.newwin(info_h, windows_w, 0, 0)
-    zone_win = curses.newwin(zone_h, windows_w, info_h, 0)
-    dialogue_win = curses.newwin(dialogue_h, windows_w, info_h + zone_h, 0)
-    
-    from utils.debug import log
-    log(f"Windows_w: {windows_w}, debug_w: {debug_w}")
-    
     if DEBUG:
-        debug_win = curses.newwin(height, debug_w, 0, windows_w)
+        if debug_pos == "left":
+            debug_win = curses.newwin(height, debug_w, 0, 0)
+            x_pos = debug_w
+        else:
+            debug_win = curses.newwin(height, debug_w, 0, windows_w)
+
+    info_win = curses.newwin(info_h, windows_w, 0, x_pos)
+    zone_win = curses.newwin(zone_h, windows_w, info_h, x_pos)
+    dialogue_win = curses.newwin(dialogue_h, windows_w, info_h + zone_h, x_pos)
+
 
     while True:
         try:

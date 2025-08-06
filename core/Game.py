@@ -4,20 +4,21 @@ from core.GameContext import GameContext
 from core.TimeManager import TimeManager
 from entities.Player import Player
 from actions.AttackAction import AttackAction
-from world.Area import Area
-from world.Path import Path
-from world.EntityPath import EntityPath
+from world.locations.Area import Area
+from world.locations.Path import Path
+from world.locations.EntityPath import EntityPath
 from events.MapDialogueEvent import MapDialogueEvent
 from events.MapFightEvent import MapFightEvent
 from entities.Monster import Monster
 from entities.Human import Human
+
 
 class Game:
     def __init__(self):
         self.world = WorldState()
         self.dialogue_manager = DialogueManager()  # gestionnaire de dialogues
         self.journal = GameContext.journal  # référence partagée
-        self.areas = {}
+        self.locations = {}  # dict : nom → instance de location
         self.current_area = None
         self.time_manager = TimeManager()
 
@@ -27,73 +28,63 @@ class Game:
         self.current_area = starting_area
 
     def setup(self):
-        # Création des zones
-        village = Area("Village", "Un petit village calme.")
-        forest = Area("Forêt", "Une forêt dense et mystérieuse.")
-        mountain = Area("Montagne", "Une montagne enneigée.")
-        lake = Area("Lac", "Un lac tranquille.")
-        cave = Area("Caverne", "Une caverne sombre.")
-        hill = Area("Colline", "Une colline rocheuse.")
-        swamp = Area("Marais", "Un marais sombre.")
+        # 🏘️ Lieux
+        village = Area("Lierrebourg", "Un village fortifié, cœur du royaume.")
+        forêt = Area("Bois des Murmures", "Forêt dense et humide, réputée pour ses bruits étranges.")
+        ferme = Area("Vieille Ferme", "Ferme abandonnée envahie par la végétation.")
+        ruines = Area("Ruines du Nord", "Pierres oubliées d’un ancien fort.")
+        route = Area("Route Royale", "Route pavée menant vers d’anciens royaumes.")
 
-        goblin_des_montagnes = Monster("Gobelin des Montagnes", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])
-        mountain.add_entity(goblin_des_montagnes)
+        # 🛣️ Chemins
+        path1 = Path(village, forêt, steps=6)
+        path2 = Path(village, ferme, steps=4)
+        path3 = Path(forêt, ruines, steps=5)
+        path4 = Path(ferme, ruines, steps=6)
+        path5 = Path(village, route, steps=8)
 
-        # Création des chemins
-        path1 = Path(village, forest, 10)
-        path2 = Path(forest, mountain, 8)
-        path3 = Path(mountain, lake, 6)
-        path4 = Path(lake, village, 5)
-        path5 = Path(mountain, cave, 4)
-        path7 = Path(lake, hill, 12)
-        path6 = Path(cave, lake, 100)
-        path7 = Path(hill, swamp, 10)
-        
+        # 🌳 Événements
+        path1.add_event_at(2, MapDialogueEvent("Un vieux bûcheron vous avertit des esprits de la forêt."))
+        path2.add_event(MapFightEvent([
+            Monster("Chien errant", 8, 3, 1, [AttackAction("Grognement", description="Un aboiement rauque vous surprend.")])
+        ]))
 
-        path1.add_event(4, MapFightEvent([Monster("Loup", 10, 5, 2, actions=[AttackAction("Morsure", description="Attaque de base")])]))
+        path3.add_event_at(4, MapDialogueEvent("Vous trouvez un pendentif ancien couvert de mousse."))
+        path5.add_event_at(5, MapFightEvent([
+            Monster("Bandit de grand chemin", 18, 6, 2, [AttackAction("Coup de masse", description="Le bandit vous attaque sans prévenir.")])
+        ]))
 
+        path1.add_event(MapDialogueEvent("Un vieux bûcheron vous avertit des esprits de la forêt."))
 
-        path7.add_event(6, MapDialogueEvent("Un renard vous aborde."))
-
-        path2.add_event(4, MapDialogueEvent("Un voyageur vous aborde pour discuter."))
-
-
-        wolves =  [Monster("Loup", 35, 12, 1, [AttackAction("Morsure", description="Croc Croc")])
-                   for _ in range(4)]
-
-        path3.add_event(2, MapFightEvent(wolves))
-
-
-        attack1 = AttackAction("Attaque", description="Attaque de base")
-        attack2 = AttackAction("Attaque lourde", description="Attaque de base", rounds=1, additional_damage=8)
-
-
-        # Ajout du joueur
-        player = Player("Héros", damage=30, health=100, defense=6, actions=[attack1, attack2])
+        # 🧍 Joueur
+        base_attack = AttackAction("Coup d'épée", description="Une attaque de base.")
+        player = Player("Écuyer", damage=22, health=90, defense=5, actions=[base_attack])
         self.set_player(player, village)
 
-        guts = Human("Guts", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
-        guts.current_path = EntityPath(guts, path5)
-        village.add_entity(guts)
+        # 👤 PNJ en route
+        garde = Human("Garde royal", health=60, damage=10, defense=3, actions=[base_attack])
+        village.add_entity(garde)
+        garde.current_path = EntityPath(garde, path5, origin=path5.start)
 
-        villager = Human("Villager", health=100, damage=10, defense=5, actions=[AttackAction("Attaque", description="Attaque de base")])
-        village.add_entity(villager)
+        # 🗺️ Ajout au monde
+        for area in [village, forêt, ferme, ruines, route]:
+            self.add_area(area)
+        for path in [path1, path2, path3, path4, path5]:
+            self.add_path(path)
 
-        self.add_area(village)
-        self.add_area(forest)
-        self.add_area(mountain)
-        self.add_area(lake)
-        self.add_area(cave)
-        self.add_area(hill)
-
-        self.current_area = village    
 
     def add_area(self, area):
-        self.areas[area.name] = area
+        self.locations[area.name] = area
         if self.current_area is None:
             self.current_area = area  # première zone définie
+        
+    def add_path(self, path):
+        self.locations[path.get_name()] = path
+    
+    def add_message(self, message):
+        GameContext.get_game_controller(self).messages.append(message)
     
     def tick(self):
+
         # 1. Avance le temps
         if self.time_manager.advance_minutes(10):
             self.world.day = self.time_manager.get_day()
@@ -101,33 +92,9 @@ class Game:
         # 2. Faire évoluer la météo
         self.world.weather.update(self.time_manager)
 
-        # 3. Faire avancer les entités
-        for area in self.areas.values():
-            for entity in area.get_other_entities(self.player):
+        # 3. Faire avancer les entités et verifier les événements
+        for location in self.locations.values():
+            for entity in location.get_entities():
 
                 if entity.current_path:
-                    entity.advance_path(self)
-                    from utils.debug import log
-                    path = entity.get_current_path()
-                    if path:
-                        log(f"P [{entity.name}] : {path}, STEPS: {path.get_steps_done()}")
-                    else:
-                        log(f"P [{entity.name}] : Aucun chemin actif.")
-
-
-    def change_area(self, name):
-        if name in self.areas:
-            self.current_area = self.areas[name]
-            print(f"\n[Déplacement] Vous entrez dans {name}.")
-            self.journal.add(self.world.day, f"Entrée dans {name}.")
-        else:
-            print(f"[Erreur] Zone inconnue : {name}")
-
-    def wait(self, minutes):
-
-        day_changed = self.time_manager.advance_minutes(minutes)
-        self.journal.add(self.world.day, f"Vous avez attendu {minutes} minutes.")
-
-        if day_changed:
-            self.world.advance_day()
-            self.journal.add(self.world.day, f"Un nouveau jour commence. Météo : {self.world.weather.current}.")
+                    entity.advance_path(self, GameContext.get_game_controller(self))

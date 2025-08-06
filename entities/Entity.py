@@ -18,7 +18,7 @@ class Entity(Talkable):
         self.current_path = None
     
     def getName(self):
-        return f"[{self.name}]"
+        return f"{self.name}"
 
     def __str__(self):
         return f"{self.getName()} {self.health_bar(self.health, self.max_health)}"
@@ -29,13 +29,12 @@ class Entity(Talkable):
 
     def start_path(self, path, destination):
         from world.locations.EntityPath import EntityPath
-        self.current_path = EntityPath(self, path, path.get_other_end(destination))
+        self.current_path = EntityPath(self, path)
         self.location = self.current_path.path
  
     def advance_path(self, game, controller):
         from utils.debug import log
-        log(f"{self.getName()} va vers {self.location}")
-        log(f"events: {self.location.events}")
+        log(f"{self.getName()} va vers {self.current_path.destination} ({self.current_path.steps_done} / {self.current_path.path.steps}) index: {self.current_path.index}")
         self.location.trigger_events(self, controller)
 
         if self.current_path:

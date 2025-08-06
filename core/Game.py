@@ -62,8 +62,8 @@ class Game:
 
         # 👤 PNJ en route
         garde = Human("Garde royal", health=60, damage=10, defense=3, actions=[base_attack])
-        village.add_entity(garde)
-        garde.current_path = EntityPath(garde, path5, origin=path5.start)
+        forêt.add_entity(garde)
+        garde.current_path = EntityPath(garde, path1)
 
         # 🗺️ Ajout au monde
         for area in [village, forêt, ferme, ruines, route]:

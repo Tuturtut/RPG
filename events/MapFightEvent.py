@@ -8,9 +8,6 @@ class MapFightEvent(Event):
         self.enemies = enemies
 
     def execute(self, entities, controller):
-        from utils.debug import log
-        log("MapFightEvent")
-
         for entity in entities:
 
             if not isinstance(entity, Player):

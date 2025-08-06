@@ -22,4 +22,4 @@ class Path(Location):
         return f"{self.start.name} -> {self.end.name}"
 
     def __str__(self):
-        return f"[{self.end.name}]"
+        return f"-{self.end.name}-"

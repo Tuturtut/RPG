@@ -80,6 +80,4 @@ class GameController:
         self.messages.append(f"Dialogue : {message}")
 
     def start_fight(self, triggers, enemies, message):
-        from utils.debug import log
-        log(f"Starting fight with {enemies} and {triggers}")
         self.set_context(CombatContext(self, CombatManager(self.game.player, enemies), self.context))

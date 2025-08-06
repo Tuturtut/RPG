@@ -37,7 +37,7 @@ class BaseContext(InterfaceContext):
             debug_win.clear(); debug_win.box()
             # Option: un hook debug si besoin (ex. nom du contexte)
             try:
-                self.draw_multiline(debug_win, get_logs(), debug_win.getmaxyx()[0])
+                self.draw_multiline(debug_win, get_logs(48), debug_win.getmaxyx()[0])
             except Exception:
                 pass
             debug_win.refresh()

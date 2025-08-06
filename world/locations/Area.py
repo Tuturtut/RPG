@@ -38,4 +38,4 @@ class Area(Location):
     
 
     def __str__(self):
-        return f"Area(name={self.name}, description={self.description})"
+        return f"[{self.name}]"

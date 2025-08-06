@@ -5,13 +5,19 @@ from tui.interface.ExplorationContext import ExplorationContext
 import traceback
 from utils.debug import log
 from core.GameContext import GameContext
+from Config import Config
 
 def startCurses():
     curses.wrapper(main)
 
 def main(stdscr):
 
-    DEBUG = True
+    config = Config()
+
+    log(f"DEBUG: {config.get('debug', 'enabled')}")
+
+
+    DEBUG = config.get("debug", "enabled", default=False)
 
     # Initialisation de curses
     curses.curs_set(0)
@@ -33,7 +39,7 @@ def main(stdscr):
     debug_w = width // 2
 
     # Position
-    debug_pos = "left"
+    debug_pos = config.get("debug", "position", default="left")
     x_pos = 0
 
     if DEBUG:

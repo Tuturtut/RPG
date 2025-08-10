@@ -1,10 +1,42 @@
+# Environnements
 .venv/
+env/
+venv/
+
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Caches d'outils
 .mypy_cache/
 .pytest_cache/
 .cache/
+
+# Distribution / build
 dist/
 build/
-*.log
 *.egg-info/
+*.egg
+.eggs/
+
+# Logs et rapports
+*.log
+coverage.xml
+htmlcov/
+.coverage
+.coverage.*
+
+# Configs locales / IDE
+.vscode/
+.idea/
+*.iml
+
+# Autres fichiers générés
+*.spec
+.DS_Store
+Thumbs.db
+
+# Fichiers de test ou debug temporaires
+tmp/

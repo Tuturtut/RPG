@@ -7,7 +7,6 @@ class RPGApp(App):
     BINDINGS = [("q", "quit", "Quit")]
 
     def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
         yield Static("RPG (Textual) — Press Q to quit.", id="main")
         yield Footer()
 

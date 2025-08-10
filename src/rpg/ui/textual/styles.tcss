@@ -1,0 +1,2 @@
+Screen { background: black; color: white; }
+#main { padding: 1 2; }

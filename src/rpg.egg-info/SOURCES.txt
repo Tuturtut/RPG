@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+src/rpg/__init__.py
+src/rpg.egg-info/PKG-INFO
+src/rpg.egg-info/SOURCES.txt
+src/rpg.egg-info/dependency_links.txt
+src/rpg.egg-info/requires.txt
+src/rpg.egg-info/top_level.txt
+src/rpg/ui/textual/__init__.py
+src/rpg/ui/textual/app.py

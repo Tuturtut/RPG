@@ -1,11 +1,3 @@
-Metadata-Version: 2.4
-Name: rpg
-Version: 0.1.0
-Summary: Minimal RPG starter
-Requires-Python: >=3.11
-Description-Content-Type: text/markdown
-Requires-Dist: textual>=0.58.0
-
 # RPG — minimal starter
 
 ## Setup

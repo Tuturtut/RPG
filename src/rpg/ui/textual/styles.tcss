@@ -1,2 +1,14 @@
-Screen { background: black; color: white; }
-#main { padding: 1 2; }
+Screen {
+    background: black;
+    color: white;
+    overflow: hidden;       /* masque les scrollbars globales */
+    scrollbar-size: 0 0;
+}
+
+#log {
+    height: 1fr;
+    border: none;
+    background: black;      /* uniforme avec l’écran */
+    overflow: hidden;       /* pas de scroll */
+    scrollbar-size: 0 0;
+}

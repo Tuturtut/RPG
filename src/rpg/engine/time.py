@@ -41,6 +41,34 @@ class Scheduler:
         heappush(self._q, (self.time.total_minutes + minutes, self._counter, cb))
         self._counter += 1
 
+    def call_at(self, hour: int, minute: int, cb: Callable[[], None]) -> None:
+        """Planifie cb aujourd'hui à HH:MM (ou demain si déjà passé)."""
+        today = (self.time.day - 1) * 24 * 60
+        target = today + hour * 60 + minute
+        if target <= self.time.total_minutes:
+            target += 24 * 60  # demain
+        heappush(self._q, (target, self._counter, cb))
+        self._counter += 1
+
+    def call_every(self, interval: int, cb: Callable[[], None]) -> None:
+        """Planifie cb toutes les `interval` minutes (répétitif)."""
+        def wrap() -> None:
+            cb()
+            self.call_in(interval, wrap)
+        self.call_in(interval, wrap)
+    
+    
+    def call_on(self, day: int, hour: int, minute: int, cb: Callable[[], None]) -> None:
+        """Planifie cb au JOUR/HEURE/MINUTE absolus (day>=1).
+        Utile en attendant un calendrier custom : on reste en minutes absolues.
+        """
+        if day < 1:
+            raise ValueError("day must be >= 1")
+        target = (day - 1) * 24 * 60 + hour * 60 + minute
+        heappush(self._q, (target, self._counter, cb))
+        self._counter += 1
+
+
     def tick(self, minutes: int = 1) -> None:
         """Fait avancer le temps et exécute les tâches dues."""
         self.time.advance(minutes)

@@ -52,6 +52,24 @@ class EventBus:
         for h in list(self._handlers[scope].get(event_type, [])):
             h(payload)
 
+    def unsubscribe(self, token: Token) -> None:
+        """Retire le handler inscrit avec ce token (idempotent)."""
+        entry = self._tokens.pop(token, None)
+        if not entry:
+            return  # déjà désinscrit
+        scope, event_type, handler = entry
+        lst = self._handlers.get(scope, {}).get(event_type, [])
+        try:
+            lst.remove(handler)
+        except ValueError:
+            pass  # déjà retiré
+        # Nettoyage si la liste (ou le scope) est vide
+        if not lst and scope in self._handlers:
+            self._handlers[scope].pop(event_type, None)
+            if not self._handlers[scope]:
+                self._handlers.pop(scope, None)
+
+
     def close_scope(self, scope: Scope) -> None:
         # Supprime tous les handlers rattachés à ce scope (utile quand on quitte une zone/écran)
         if scope in self._handlers:
